@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_products"
+            android:icon="@drawable/products"
+            android:title="Products" />
+        <item
+            android:id="@+id/nav_stocks"
+            android:icon="@drawable/accessory"
+            android:title="Stocks" />
+        <item
+            android:id="@+id/nav_expense"
+            android:icon="@drawable/baseline_construction_24"
+            android:title="Expenses" />
+
+    </group>
+
+    <item android:title="Sales Person">
+        <menu>
+            <item
+                android:id="@+id/nav_employee"
+                android:icon="@drawable/customer"
+                android:title="Employee" />
+
+            <item
+                android:id="@+id/nav_attendance"
+                android:icon="@drawable/baseline_work_history_24"
+                android:title="Attendance" />
+
+            <item
+                android:id="@+id/nav_employee_report"
+                android:icon="@drawable/baseline_supervisor_account_24"
+                android:title="Employee Report" />
+        </menu>
+    </item>
+
+    <item android:title="Invoice">
+        <menu>
+            <item
+                android:id="@+id/nav_invoice"
+                android:icon="@drawable/baseline_file_copy_24"
+                android:title="Invoice Details" />
+            <item
+                android:id="@+id/nav_report"
+                android:icon="@drawable/line"
+                android:title="Sales Report" />
+            <item
+                android:id="@+id/nav_consolidate_report"
+                android:icon="@drawable/baseline_featured_play_list_24"
+                android:title="Consolidate Report" />
+
+        </menu>
+    </item>
+
+</menu>

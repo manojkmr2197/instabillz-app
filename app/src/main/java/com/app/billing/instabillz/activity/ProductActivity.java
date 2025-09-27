@@ -2,58 +2,56 @@ package com.app.billing.instabillz.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.billing.instabillz.R;
 import com.app.billing.instabillz.adapter.BillingViewAdapter;
+import com.app.billing.instabillz.adapter.ProductViewAdapter;
 import com.app.billing.instabillz.listener.BillingClickListener;
 import com.app.billing.instabillz.model.ProductModel;
-import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+public class ProductActivity extends AppCompatActivity implements View.OnClickListener {
+
+    TextView back,download;
+    EditText etSearch;
+    RecyclerView recyclerView;
+    FloatingActionButton add_fab;
 
     Context context;
     Activity activity;
 
-    DrawerLayout mDrawerLayout;
-    NavigationView navigationView;
-    BillingClickListener listener;
-
     EditText productSearch;
     List<ProductModel> filteredList;
     List<ProductModel> products;
-    BillingViewAdapter adapter;
-
-    Button submit, preview;
+    ProductViewAdapter adapter;
+    BillingClickListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_product);
         if (AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_NO) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
@@ -63,27 +61,23 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(getResources().getColor(android.R.color.transparent, getTheme()));
         }
-        context = HomeActivity.this;
-        activity = HomeActivity.this;
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.home_drawer_layout);
-        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        TextView textView = (TextView) findViewById(R.id.home_nav_text_view);
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        context = ProductActivity.this;
+        activity = ProductActivity.this;
 
-                if (!mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    mDrawerLayout.openDrawer(GravityCompat.START);
-                } else {
-                    mDrawerLayout.closeDrawer(GravityCompat.START);
-                }
+        productSearch = (EditText) findViewById(R.id.product_etSearch);
+        recyclerView = (RecyclerView) findViewById(R.id.product_recyclerView);
+        back = (TextView) findViewById(R.id.product_back);
+        back.setOnClickListener(this);
 
-            }
-        });
+        download = (TextView) findViewById(R.id.product_download);
+        download.setOnClickListener(this);
 
+        add_fab = (FloatingActionButton) findViewById(R.id.product_add_fab);
+        add_fab.setOnClickListener(this);
+
+        RecyclerView recyclerView = findViewById(R.id.product_recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         listener = new BillingClickListener() {
             @Override
@@ -95,8 +89,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         };
-        RecyclerView recyclerView = findViewById(R.id.home_recyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 columns
 
         products = new ArrayList<>();
         products.add(new ProductModel("Regular Tea", 15.0));
@@ -122,12 +114,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         filteredList = new ArrayList<>();
         filteredList.addAll(products);
-        adapter = new BillingViewAdapter(context,filteredList,listener);
+        adapter = new ProductViewAdapter(context,filteredList,listener);
         recyclerView.setAdapter(adapter);
-
-        productSearch = (EditText) findViewById(R.id.home_etSearch);
-        submit = (Button) findViewById(R.id.home_submit_invoice);
-        preview = (Button) findViewById(R.id.home_preview);
 
         // 🔎 Listen to text changes
         productSearch.addTextChangedListener(new TextWatcher() {
@@ -140,16 +128,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void afterTextChanged(Editable s) {
-                homePageFilter(s.toString());
+                productPageFilter(s.toString());
             }
         });
 
-        submit.setOnClickListener(this);
-        preview.setOnClickListener(this);
-
     }
 
-    private void homePageFilter(CharSequence constraint) {
+    private void productPageFilter(CharSequence constraint) {
         filteredList.clear();
         if (constraint == null || constraint.length() == 0) {
             filteredList.addAll(products);
@@ -166,50 +151,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Intent i = null;
-        mDrawerLayout.closeDrawer(GravityCompat.START);
-        if (item.getItemId() == R.id.nav_products) {
-            i = new Intent(HomeActivity.this, ProductActivity.class);
-            startActivity(i);
-        } else if (item.getItemId() == R.id.nav_stocks) {
-            i = new Intent(HomeActivity.this, StockActivity.class);
-            startActivity(i);
-        } else if (item.getItemId() == R.id.nav_expense) {
-            i = new Intent(HomeActivity.this, ExpenseActivity.class);
-            startActivity(i);
-        } else if (item.getItemId() == R.id.nav_employee) {
-            i = new Intent(HomeActivity.this, EmployeeActivity.class);
-            startActivity(i);
-        } else if (item.getItemId() == R.id.nav_attendance) {
-            i = new Intent(HomeActivity.this, EmployeeActivity.class);
-            startActivity(i);
-        } else if (item.getItemId() == R.id.nav_employee_report) {
-            i = new Intent(HomeActivity.this, EmployeeReportActivity.class);
-            startActivity(i);
-        } else if (item.getItemId() == R.id.nav_invoice) {
-            i = new Intent(HomeActivity.this, InvoiceActivity.class);
-            startActivity(i);
-        } else if (item.getItemId() == R.id.nav_report) {
-            i = new Intent(HomeActivity.this, ReportActivity.class);
-            startActivity(i);
-        } else if (item.getItemId() == R.id.nav_consolidate_report) {
-            i = new Intent(HomeActivity.this, ConsolidateReportActivity.class);
-            startActivity(i);
-        }
-        return true;
-    }
-
-    @Override
     public void onClick(View view) {
-        if(R.id.home_submit_invoice == view.getId()){
 
-        }else if(R.id.home_preview == view.getId()){
-            for (ProductModel product : products) {
-                if (product.getQty() > 0) {
-                    System.out.println("Product Name: " + product.getName() + ", Quantity: " + product.getQty());
-                }
-            }
+        if(view.getId() == R.id.product_back){
+            finish();
+        }else if(view.getId() == R.id.product_download){
+
+        }else if(view.getId() == R.id.product_add_fab){
+
         }
+
     }
 }

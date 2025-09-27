@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "193642071762",
+    "project_id": "sha-attar-invoice",
+    "storage_bucket": "sha-attar-invoice.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:193642071762:android:e289129f765925e6a98f0b",
+        "android_client_info": {
+          "package_name": "com.app.sha.perfume.invoice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_oo8nu5RmLxoxQd-x-dUrYs1RSLO-B8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
