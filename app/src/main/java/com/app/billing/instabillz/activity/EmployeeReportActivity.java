@@ -37,9 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -167,7 +165,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
 
     private void removeAttendanceItem(int position) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        String docId = attendanceModelList.get(position).getEmployee_name() + "_" + attendanceModelList.get(position).getDate();
+        String docId = attendanceModelList.get(position).getEmployeeName() + "_" + attendanceModelList.get(position).getDate();
         InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION, docId, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
@@ -278,7 +276,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
         Query query = db.collection(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION);
 
         if (!employeeName.equals("Select Employee")) {
-            query = query.whereEqualTo("employee_name", employeeName);
+            query = query.whereEqualTo("employeeName", employeeName);
         }
 
         query = query

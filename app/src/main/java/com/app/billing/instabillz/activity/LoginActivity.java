@@ -147,7 +147,10 @@ public class LoginActivity extends AppCompatActivity {
                     sharedPrefHelper.setSystemUserDetails(model);
 
                     // Go to Home screen
-                    startActivity(new Intent(context, HomeActivity.class));
+
+                    Intent intent = new Intent(context, HomeActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                     finish();
                 }else{
                     Toast.makeText(context, "⚠️ Invalid passcode. Please try again.", Toast.LENGTH_SHORT).show();

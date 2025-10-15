@@ -29,11 +29,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -168,8 +166,8 @@ public class AttendanceActivity extends AppCompatActivity {
                 String workingHours = calculateWorkingHours(loginTime, selectedTime);
 
                 Map<String, Object> data = new HashMap<>();
-                data.put("logout_time", selectedTime);
-                data.put("working_hours", workingHours);
+                data.put("logoutTime", selectedTime);
+                data.put("workingHours", workingHours);
                 Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
                 InstaFirebaseRepository.getInstance().updateData(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION, docId, data, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
@@ -228,13 +226,13 @@ public class AttendanceActivity extends AppCompatActivity {
                     AttendanceModel attendance = doc.toObject(AttendanceModel.class);
 
                     if (attendance != null) {
-                        tvLoginTime.setText(attendance.getLogin_time() != null ? attendance.getLogin_time() : "--:--");
-                        tvLogoutTime.setText(attendance.getLogout_time() != null ? attendance.getLogout_time() : "--:--");
-                        tvWorkingHours.setText("Working Hours: " + (attendance.getWorking_hours() != null ? attendance.getWorking_hours() : "--"));
+                        tvLoginTime.setText(attendance.getLoginTime() != null ? attendance.getLoginTime() : "--:--");
+                        tvLogoutTime.setText(attendance.getLogoutTime() != null ? attendance.getLogoutTime() : "--:--");
+                        tvWorkingHours.setText("Working Hours: " + (attendance.getWorkingHours() != null ? attendance.getWorkingHours() : "--"));
 
                         // Enable/disable buttons based on data
-                        btnLogin.setEnabled(attendance.getLogin_time() == null);
-                        btnLogout.setEnabled(attendance.getLogin_time() != null && attendance.getLogout_time() == null);
+                        btnLogin.setEnabled(attendance.getLoginTime() == null);
+                        btnLogout.setEnabled(attendance.getLoginTime() != null && attendance.getLogoutTime() == null);
                     } else {
                         resetUI();
                     }

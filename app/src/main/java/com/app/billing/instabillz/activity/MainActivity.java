@@ -19,7 +19,7 @@ import com.app.billing.instabillz.utils.SingleTon;
 public class MainActivity extends AppCompatActivity {
 
 
-    private static int TIME_OUT = 2000;
+    private static int TIME_OUT = 500;
     private boolean isNavigated = false;
 
     ImageView ownerLogo, partnershipIcon, clientLogo;
@@ -64,14 +64,14 @@ public class MainActivity extends AppCompatActivity {
         // Step 1: Fade in owner logo
         ownerLogo.animate()
                 .alpha(1f)
-                .setDuration(1000)
+                .setDuration(500)
                 .withEndAction(() -> {
 
                     // Step 2: Fade in partnership icon
                     partnershipIcon.animate()
                             .alpha(1f)
-                            .setDuration(800)
-                            .setStartDelay(400)
+                            .setDuration(500)
+                            .setStartDelay(200)
                             .withEndAction(() -> {
 
                                 // Step 3: Slide up and fade in client logo
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                                 clientLogo.animate()
                                         .translationYBy(-100f)
                                         .alpha(1f)
-                                        .setDuration(1000)
+                                        .setDuration(500)
                                         .withEndAction(this::navigateToLogin) // ✅ Only navigate once
                                         .start();
 
@@ -92,8 +92,11 @@ public class MainActivity extends AppCompatActivity {
         isNavigated = true;
 
         new Handler().postDelayed(() -> {
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
             finish();
+
         }, TIME_OUT);
     }
 

@@ -50,6 +50,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -301,7 +302,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
             InvoiceModel newInvoice = new InvoiceModel();
-            newInvoice.setBillingDate(OffsetDateTime.now().toEpochSecond());
+            // IST ZoneOffset is +5:30
+            ZoneOffset istOffset = ZoneOffset.ofHoursMinutes(5, 30);
+            newInvoice.setBillingDate(OffsetDateTime.now(istOffset).toEpochSecond());
             newInvoice.setEmployeeName(sharedPrefHelper.getSystemUserName());
             newInvoice.setEmployeePhone(sharedPrefHelper.getSystemUserPhone());
             newInvoice.setPrint(false);

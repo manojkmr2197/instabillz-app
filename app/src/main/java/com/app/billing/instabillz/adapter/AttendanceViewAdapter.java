@@ -45,9 +45,9 @@ public class AttendanceViewAdapter extends RecyclerView.Adapter<AttendanceViewHo
         AttendanceModel attendanceModel = attendanceModelList.get(position);
 
         holder.date.setText(attendanceModel.getDate());
-        holder.loginTime.setText(StringUtils.isNotBlank(attendanceModel.getLogin_time())?attendanceModel.getLogin_time():"--:--");
-        holder.logoutTime.setText(StringUtils.isNotBlank(attendanceModel.getLogout_time())?attendanceModel.getLogout_time():"--:--");
-        holder.hours.setText(StringUtils.isNotBlank(attendanceModel.getWorking_hours())?attendanceModel.getWorking_hours():"--:--");
+        holder.loginTime.setText(StringUtils.isNotBlank(attendanceModel.getLoginTime())?attendanceModel.getLoginTime():"--:--");
+        holder.logoutTime.setText(StringUtils.isNotBlank(attendanceModel.getLogoutTime())?attendanceModel.getLogoutTime():"--:--");
+        holder.hours.setText(StringUtils.isNotBlank(attendanceModel.getWorkingHours())?attendanceModel.getWorkingHours():"--:--");
 
         if(isAdmin){
             holder.delete.setVisibility(View.VISIBLE);

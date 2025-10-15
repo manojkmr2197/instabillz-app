@@ -1,32 +1,32 @@
 package com.app.billing.instabillz.model;
 
 public class AttendanceModel {
-    private String employee_name;
+    private String employeeName;
     private String date;
-    private String login_time;
-    private String logout_time;
-    private String working_hours;
+    private String loginTime;
+    private String logoutTime;
+    private String workingHours;
 
     // ✅ Required empty constructor for Firestore
     public AttendanceModel() {
     }
 
     // ✅ Full constructor
-    public AttendanceModel(String employee_name, String date, String login_time, String logout_time, String working_hours) {
-        this.employee_name = employee_name;
+    public AttendanceModel(String employeeName, String date, String loginTime, String logout_time, String workingHours) {
+        this.employeeName = employeeName;
         this.date = date;
-        this.login_time = login_time;
-        this.logout_time = logout_time;
-        this.working_hours = working_hours;
+        this.loginTime = loginTime;
+        this.logoutTime = logout_time;
+        this.workingHours = workingHours;
     }
 
     // ✅ Getters and setters
-    public String getEmployee_name() {
-        return employee_name;
+    public String getEmployeeName() {
+        return employeeName;
     }
 
-    public void setEmployee_name(String employee_name) {
-        this.employee_name = employee_name;
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
     }
 
     public String getDate() {
@@ -37,27 +37,27 @@ public class AttendanceModel {
         this.date = date;
     }
 
-    public String getLogin_time() {
-        return login_time;
+    public String getLoginTime() {
+        return loginTime;
     }
 
-    public void setLogin_time(String login_time) {
-        this.login_time = login_time;
+    public void setLoginTime(String loginTime) {
+        this.loginTime = loginTime;
     }
 
-    public String getLogout_time() {
-        return logout_time;
+    public String getLogoutTime() {
+        return logoutTime;
     }
 
-    public void setLogout_time(String logout_time) {
-        this.logout_time = logout_time;
+    public void setLogoutTime(String logoutTime) {
+        this.logoutTime = logoutTime;
     }
 
-    public String getWorking_hours() {
-        return working_hours;
+    public String getWorkingHours() {
+        return workingHours;
     }
 
-    public void setWorking_hours(String working_hours) {
-        this.working_hours = working_hours;
+    public void setWorkingHours(String workingHours) {
+        this.workingHours = workingHours;
     }
 }
