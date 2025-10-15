@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/dialog_bg"
+    android:gravity="center">
+
+    <!-- Warning Icon -->
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/baseline_warning_24"
+        app:tint="@android:color/holo_red_light"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Subscription Expired"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Message -->
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your app subscription has expired. Please contact the administrator for renewal or support."
+        android:textAlignment="center"
+        android:textColor="#444444"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Clickable Phone Number -->
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="24dp">
+
+        <!-- Call Icon -->
+        <ImageView
+            android:id="@+id/ivCall"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/baseline_call_24"
+            app:tint="@color/app_color"
+            android:layout_marginEnd="6dp" />
+
+        <!-- Phone Number -->
+        <TextView
+            android:id="@+id/tvPhoneNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="9585905176"
+            android:textColor="@color/app_color"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+
+    <!-- OK Button -->
+    <Button
+        android:id="@+id/btnOk"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="OK"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:backgroundTint="@color/app_color"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

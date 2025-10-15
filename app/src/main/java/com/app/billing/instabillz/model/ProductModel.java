@@ -2,7 +2,7 @@ package com.app.billing.instabillz.model;
 
 public class ProductModel {
 
-    private int id;
+    private String id;
     private String name;
     private Double price;
     private int qty;
@@ -10,17 +10,19 @@ public class ProductModel {
     private String categoryName;
     private String code;
 
+    public ProductModel() {
+    }
 
     public ProductModel(String name, Double price) {
         this.name = name;
         this.price = price;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

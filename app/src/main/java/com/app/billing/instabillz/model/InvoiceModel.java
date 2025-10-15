@@ -7,12 +7,13 @@ public class InvoiceModel {
     Long billingDate;
     Double totalCost;
     Double sellingCost;
-    Double discount;
+    Double parcelCost;
     String employeeName;
     String employeePhone;
     String paymentMode;
     String upiPaymentStatus;
     Boolean isPrint;
+    Integer token;
     List<ProductModel> productModelList;
 
     public Long getBillingDate() {
@@ -39,12 +40,12 @@ public class InvoiceModel {
         this.sellingCost = sellingCost;
     }
 
-    public Double getDiscount() {
-        return discount;
+    public Double getParcelCost() {
+        return parcelCost;
     }
 
-    public void setDiscount(Double discount) {
-        this.discount = discount;
+    public void setParcelCost(Double parcelCost) {
+        this.parcelCost = parcelCost;
     }
 
     public String getEmployeeName() {
@@ -93,5 +94,13 @@ public class InvoiceModel {
 
     public void setProductModelList(List<ProductModel> productModelList) {
         this.productModelList = productModelList;
+    }
+
+    public Integer getToken() {
+        return token;
+    }
+
+    public void setToken(Integer token) {
+        this.token = token;
     }
 }

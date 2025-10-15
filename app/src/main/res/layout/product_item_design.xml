@@ -18,6 +18,7 @@
             android:layout_height="25dp"
             android:layout_gravity="bottom"
             android:layout_marginEnd="5dp"
+            app:backgroundTint="@color/app_color"
             android:background="@drawable/ic_baseline_clear_24" />
 
         <LinearLayout
@@ -69,6 +70,7 @@
             android:layout_height="25dp"
             android:layout_gravity="bottom"
             android:layout_marginStart="5dp"
+            app:backgroundTint="@color/app_color"
             android:background="@drawable/ic_baseline_edit_24" />
 
     </LinearLayout>

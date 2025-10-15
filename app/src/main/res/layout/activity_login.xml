@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".activity.LoginActivity">
+
+    <!-- Top Right "Login with Different User" -->
+    <TextView
+        android:id="@+id/tvDifferentUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="16dp"
+        android:text="Login with different user"
+        android:textColor="@color/app_color"
+        android:textSize="14sp" />
+
+    <!-- Center Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:gravity="center">
+            <!-- App Logo -->
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/app_image" />
+            <!-- App Logo -->
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="10sp"
+                android:src="@drawable/partnership" />
+            <!-- App Logo -->
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/client_logo" />
+        </LinearLayout>
+
+        <!-- Phone Number -->
+        <EditText
+            android:id="@+id/etPhoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/edittext_background"
+            android:gravity="center"
+            android:hint="Enter phone number"
+            android:inputType="phone"
+            android:maxLength="10"
+            android:padding="10dp"
+            android:textSize="16sp" />
+
+        <!-- 4 Digit Passcode -->
+        <LinearLayout
+            android:id="@+id/passcodeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etDigit1"
+                android:inputType="numberPassword"
+                android:cursorVisible="false"
+                style="@style/PasscodeDigitStyle" />
+
+            <EditText
+                android:id="@+id/etDigit2"
+                android:inputType="numberPassword"
+                android:cursorVisible="false"
+                style="@style/PasscodeDigitStyle" />
+
+            <EditText
+                android:id="@+id/etDigit3"
+                android:inputType="numberPassword"
+                android:cursorVisible="false"
+                style="@style/PasscodeDigitStyle" />
+
+            <EditText
+                android:id="@+id/etDigit4"
+                android:inputType="numberPassword"
+                android:cursorVisible="false"
+                style="@style/PasscodeDigitStyle" />
+        </LinearLayout>
+
+        <!-- Login Button -->
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="40dp"
+            android:backgroundTint="@color/app_color"
+            android:text="Login"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+</RelativeLayout>

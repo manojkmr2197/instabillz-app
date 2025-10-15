@@ -5,6 +5,102 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".activity.EmployeeReportActivity">
+
+    <!-- Heading -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginStart="10dp">
+
+        <TextView
+            android:id="@+id/attendance_report_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_baseline_arrow_back_24" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="50dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="InstaBillz"
+                android:textColor="@color/app_color"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Complete your business with ease"
+                android:textColor="@color/app_color"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10sp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/attendance_report_filter_ll"
+            android:padding="4dp">
+
+            <Spinner
+                android:id="@+id/attendance_report_employees_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="5dp"
+                android:textAlignment="center"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/spinner_bg" />
+
+            <Spinner
+                android:id="@+id/attendance_report_date_range"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:padding="5dp"
+                android:background="@drawable/spinner_bg" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/attendance_report_search"
+            android:layout_width="200sp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:backgroundTint="@color/app_color"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:text="Search Report" />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/attendance_report_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+        android:nestedScrollingEnabled="false"
+        android:overScrollMode="always" />
 
 </LinearLayout>

@@ -1,0 +1,71 @@
+package com.app.billing.instabillz.adapter;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.billing.instabillz.R;
+import com.app.billing.instabillz.listener.BillingClickListener;
+import com.app.billing.instabillz.model.AttendanceModel;
+import com.app.billing.instabillz.viewholder.AttendanceViewHolder;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+
+public class AttendanceViewAdapter extends RecyclerView.Adapter<AttendanceViewHolder>{
+
+    Context context;
+    List<AttendanceModel> attendanceModelList;
+    BillingClickListener listener;
+    Boolean isAdmin;
+
+    public AttendanceViewAdapter(Context context, List<AttendanceModel> attendanceModelList, BillingClickListener listener,Boolean isAdmin) {
+        this.context = context;
+        this.attendanceModelList = attendanceModelList;
+        this.listener = listener;
+        this.isAdmin = isAdmin;
+    }
+
+    @NonNull
+    @Override
+    public AttendanceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.attandence_item_design, parent, false);
+        return new AttendanceViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull AttendanceViewHolder holder, int position) {
+
+        AttendanceModel attendanceModel = attendanceModelList.get(position);
+
+        holder.date.setText(attendanceModel.getDate());
+        holder.loginTime.setText(StringUtils.isNotBlank(attendanceModel.getLogin_time())?attendanceModel.getLogin_time():"--:--");
+        holder.logoutTime.setText(StringUtils.isNotBlank(attendanceModel.getLogout_time())?attendanceModel.getLogout_time():"--:--");
+        holder.hours.setText(StringUtils.isNotBlank(attendanceModel.getWorking_hours())?attendanceModel.getWorking_hours():"--:--");
+
+        if(isAdmin){
+            holder.delete.setVisibility(View.VISIBLE);
+        }else{
+            holder.delete.setVisibility(View.GONE);
+        }
+
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.click(position,"DELETE");
+            }
+        });
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return attendanceModelList.size();
+    }
+}

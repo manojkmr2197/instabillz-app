@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "193642071762",
-    "project_id": "sha-attar-invoice",
-    "storage_bucket": "sha-attar-invoice.firebasestorage.app"
+    "project_number": "436168905347",
+    "project_id": "instabillz-billing",
+    "storage_bucket": "instabillz-billing.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:193642071762:android:e289129f765925e6a98f0b",
+        "mobilesdk_app_id": "1:436168905347:android:bcff0a40ad401ab9be81b6",
         "android_client_info": {
-          "package_name": "com.app.sha.perfume.invoice"
+          "package_name": "com.app.billing.instabillz"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD_oo8nu5RmLxoxQd-x-dUrYs1RSLO-B8M"
+          "current_key": "AIzaSyDuMyHVVbAfm4F_dVtQK-uUCdF7xjcc7W0"
         }
       ],
       "services": {

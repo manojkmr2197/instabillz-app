@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:cardCornerRadius="2sp">
+
+    <!--Attar view-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/stock_item_close"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/ic_baseline_clear_24" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/stock_item_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5sp"
+                    android:maxLength="35"
+                    android:singleLine="true"
+                    android:text="Attar Name"
+                    android:textAllCaps="true"
+                    android:textColor="@color/app_color"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/stock_item_qty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5sp"
+                    android:maxLength="35"
+                    android:singleLine="true"
+                    android:text="10 Kg"
+                    android:textAllCaps="true"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10sp"
+            android:alpha="0.4"
+            android:background="@color/black" />
+
+        <!-- Load Button -->
+        <Button
+            android:id="@+id/stock_item_load"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/holo_green_light"
+            android:text="Load"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+
+        <!-- Unload Button -->
+        <Button
+            android:id="@+id/stock_item_unload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="@android:color/holo_red_light"
+            android:text="Unload"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

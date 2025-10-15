@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:paddingVertical="8dp"
+    android:background="#FFFFFF"
+    android:gravity="center"
+    android:weightSum="4"
+    android:paddingHorizontal="6dp">
+
+    <Button
+        android:id="@+id/attendance_emp_delete"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="bottom"
+        android:layout_marginEnd="5dp"
+        app:backgroundTint="@color/app_color"
+        android:background="@drawable/ic_baseline_clear_24" />
+
+    <TextView
+        android:id="@+id/attendance_emp_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="2025-10-11"
+        android:textColor="#212121"
+        android:gravity="center"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/attendance_emp_login"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="09:15"
+        android:textColor="#212121"
+        android:gravity="center"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/attendance_emp_logout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="17:45"
+        android:textColor="#212121"
+        android:gravity="center"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/attendance_emp_hours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="8h 30m"
+        android:textColor="#205C9B"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textSize="14sp" />
+</LinearLayout>

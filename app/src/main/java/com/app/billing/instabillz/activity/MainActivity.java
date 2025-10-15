@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static int TIME_OUT = 2000;
+    private boolean isNavigated = false;
+
+    ImageView ownerLogo, partnershipIcon, clientLogo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,18 +36,15 @@ public class MainActivity extends AppCompatActivity {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(getResources().getColor(android.R.color.transparent, getTheme()));
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
 
+        ownerLogo = findViewById(R.id.ownerLogo);
+        partnershipIcon = findViewById(R.id.partnershipIcon);
+        clientLogo = findViewById(R.id.clientLogo);
+
         if (checkInternet()) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Intent i = new Intent(MainActivity.this, HomeActivity.class);
-                    startActivity(i);
-                    finish();
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                }
-            }, TIME_OUT);
+            startSplashAnimation();
         } else {
             finish();
         }
@@ -57,4 +59,42 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    private void startSplashAnimation() {
+        // Step 1: Fade in owner logo
+        ownerLogo.animate()
+                .alpha(1f)
+                .setDuration(1000)
+                .withEndAction(() -> {
+
+                    // Step 2: Fade in partnership icon
+                    partnershipIcon.animate()
+                            .alpha(1f)
+                            .setDuration(800)
+                            .setStartDelay(400)
+                            .withEndAction(() -> {
+
+                                // Step 3: Slide up and fade in client logo
+                                clientLogo.setTranslationY(100f);
+                                clientLogo.animate()
+                                        .translationYBy(-100f)
+                                        .alpha(1f)
+                                        .setDuration(1000)
+                                        .withEndAction(this::navigateToLogin) // ✅ Only navigate once
+                                        .start();
+
+                            }).start();
+                }).start();
+    }
+
+    private void navigateToLogin() {
+        if (isNavigated) return; // ✅ Prevent duplicate navigation
+        isNavigated = true;
+
+        new Handler().postDelayed(() -> {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
+        }, TIME_OUT);
+    }
+
 }

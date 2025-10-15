@@ -11,4 +11,25 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+
+    <string-array name="spinner_qty_scale">
+        <item>Kg</item>
+        <item>Litre</item>
+    </string-array>
+
+    <string-array name="spinner_role">
+        <item>SALES</item>
+        <item>ADMIN</item>
+    </string-array>
+
+    <string-array name="attendance_date_ranges">
+        <item>Select Date Range</item>
+        <item>Today</item>
+        <item>Yesterday</item>
+        <item>This Week</item>
+        <item>This Month</item>
+        <item>Last 3 Months</item>
+        <item>Last 6 Months</item>
+    </string-array>
+
 </resources>

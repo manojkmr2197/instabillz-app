@@ -1,11 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/layoutAttendance"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".activity.AttendanceActivity">
+    android:background="#F7F9FB"
+    android:orientation="vertical">
 
+    <!-- Heading -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginStart="10dp">
+
+        <TextView
+            android:id="@+id/attendance_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_baseline_arrow_back_24" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="50dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="InstaBillz"
+                android:textColor="@color/app_color"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Complete your business with ease"
+                android:textColor="@color/app_color"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/attendance_filter_ll"
+        android:padding="24dp">
+
+        <Spinner
+            android:id="@+id/attendance_employees_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#205C9B" />
+
+    </LinearLayout>
+
+    <!-- Buttons Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="24dp">
+
+        <!-- Login Button -->
+        <LinearLayout
+            android:id="@+id/attendance_login_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/attendance_login_bt"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@drawable/round_button"
+                android:backgroundTint="#2ECC71"
+                android:elevation="6dp"
+                android:text="Login"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/attendance_login_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text=""
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <!-- Logout Button -->
+        <LinearLayout
+            android:id="@+id/attendance_logout_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/attendance_logout_bt"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@drawable/round_button"
+                android:backgroundTint="#E74C3C"
+                android:elevation="6dp"
+                android:text="Logout"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/attendance_logout_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text=""
+                android:textColor="#000000" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Working hours display -->
+    <TextView
+        android:id="@+id/attendance_working_hours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center"
+        android:text=""
+        android:textColor="#205C9B"
+        android:textSize="16sp" />
 </LinearLayout>
