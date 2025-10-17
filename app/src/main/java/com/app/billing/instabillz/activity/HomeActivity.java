@@ -114,6 +114,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         activity = HomeActivity.this;
         sharedPrefHelper = new SharedPrefHelper(context);
         bluetoothPrinterHelper = new BluetoothPrinterHelper(context, activity);
+        printerDataModel = sharedPrefHelper.getPrinterDetails();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.home_drawer_layout);
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -123,7 +124,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         TextView attendance = (TextView) findViewById(R.id.home_attendance_tv);
         TextView todayInvoice = (TextView) findViewById(R.id.home_today_invoice_tv);
 
-        loadPrinterData();
 
         attendance.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -717,21 +717,4 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void loadPrinterData() {
-        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(AppConstants.SHOP_COLLECTION, AppConstants.APP_NAME, new InstaFirebaseRepository.OnFirebaseWriteListener() {
-            @Override
-            public void onSuccess(Object data) {
-                DocumentSnapshot doc = (DocumentSnapshot) data;
-                if (doc.exists()) {
-                    printerDataModel = doc.toObject(PrinterDataModel.class);
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                e.printStackTrace();
-                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 }

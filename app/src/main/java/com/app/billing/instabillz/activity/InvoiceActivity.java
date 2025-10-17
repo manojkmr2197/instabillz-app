@@ -121,12 +121,12 @@ public class InvoiceActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         sharedPrefHelper = new SharedPrefHelper(context);
         bluetoothPrinterHelper = new BluetoothPrinterHelper(context, activity);
+        printerDataModel = sharedPrefHelper.getPrinterDetails();
 
         back = (TextView) findViewById(R.id.invoice_back);
         back.setOnClickListener(v -> {
             finish();
         });
-        loadPrinterData();
 
         employeeSpinner = findViewById(R.id.invoice_employees_spinner);
         dateRangeSpinner = findViewById(R.id.invoice_date_range);
@@ -554,24 +554,6 @@ public class InvoiceActivity extends AppCompatActivity {
                 employeeAdapter.notifyDataSetChanged();
                 if(StringUtils.isNotBlank(getIntent().getStringExtra("employee_name"))) {
                     employeeSpinner.setSelection(employeeAdapter.getPosition(getIntent().getStringExtra("employee_name")));
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                e.printStackTrace();
-                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void loadPrinterData() {
-        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(AppConstants.SHOP_COLLECTION, AppConstants.APP_NAME, new InstaFirebaseRepository.OnFirebaseWriteListener() {
-            @Override
-            public void onSuccess(Object data) {
-                DocumentSnapshot doc = (DocumentSnapshot) data;
-                if (doc.exists()) {
-                    printerDataModel = doc.toObject(PrinterDataModel.class);
                 }
             }
 

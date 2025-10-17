@@ -27,6 +27,7 @@ import com.app.billing.instabillz.R;
 import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.model.AttendanceModel;
 import com.app.billing.instabillz.model.EmployeeModel;
+import com.app.billing.instabillz.model.PrinterDataModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.MoveNextWatcher;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
@@ -35,6 +36,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -45,6 +49,8 @@ public class LoginActivity extends AppCompatActivity {
     Context context;
     Activity activity;
     SharedPrefHelper sharedPrefHelper;
+
+    PrinterDataModel printerDataModel = new PrinterDataModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,22 +97,26 @@ public class LoginActivity extends AppCompatActivity {
 
         etDigit4.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() == 1) {
-                    SingleTon.hideKeyboard(context,activity);
+                    SingleTon.hideKeyboard(context, activity);
                     etDigit4.clearFocus(); // 👈 remove cursor
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         btnLogin.setOnClickListener(v -> handleLogin());
         tvDifferentUser.setOnClickListener(v -> clearSharedPref());
+
+        loadPrinterData();
 
     }
 
@@ -124,21 +134,21 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        validateUser(phone,passcode);
+        validateUser(phone, passcode);
 
     }
 
     private void validateUser(String phone, String passcode) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().userLogin( phone, passcode, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().userLogin(phone, passcode, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 QuerySnapshot doc = (QuerySnapshot) data;
 
-                if(!doc.isEmpty() && doc.getDocuments().get(0).exists()){
+                if (!doc.isEmpty() && doc.getDocuments().get(0).exists()) {
                     EmployeeModel model = doc.getDocuments().get(0).toObject(EmployeeModel.class);
 
-                    if(model == null || !model.getActive()){
+                    if (model == null || !model.getActive()) {
                         Toast.makeText(context, "You are inactive Now. Please contact admin.", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -152,7 +162,7 @@ public class LoginActivity extends AppCompatActivity {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
-                }else{
+                } else {
                     Toast.makeText(context, "⚠️ Invalid passcode. Please try again.", Toast.LENGTH_SHORT).show();
                     etDigit1.setText("");
                     etDigit2.setText("");
@@ -230,6 +240,42 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    private void loadPrinterData() {
+        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(AppConstants.SHOP_COLLECTION, AppConstants.APP_NAME, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @Override
+            public void onSuccess(Object data) {
+                DocumentSnapshot doc = (DocumentSnapshot) data;
+                if (doc.exists()) {
+                    printerDataModel = doc.toObject(PrinterDataModel.class);
+
+                    if (printerDataModel != null && printerDataModel.getActive()) {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        LocalDate subscriptionDate = LocalDate.parse(printerDataModel.getSubscriptionDate(), formatter);
+                        LocalDate today = LocalDate.now();
+
+                        // ✅ Allow only if today is on or before subscription date
+                        if (!today.isAfter(subscriptionDate)) {
+                            // Subscription still valid
+                            sharedPrefHelper.setPrinterDetails(printerDataModel);
+                        } else {
+                            // Subscription expired
+                            showSubscriptionErrorDialog();
+                        }
+
+                    } else {
+                        showSubscriptionErrorDialog();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 }

@@ -11,6 +11,8 @@ public class PrinterDataModel {
     private String footer2;
     private String footer3;
     private String printerName;
+    private String subscriptionDate;
+    private Boolean active;
 
     public String getId() {
         return id;
@@ -82,5 +84,21 @@ public class PrinterDataModel {
 
     public void setPrinterName(String printerName) {
         this.printerName = printerName;
+    }
+
+    public String getSubscriptionDate() {
+        return subscriptionDate;
+    }
+
+    public void setSubscriptionDate(String subscriptionDate) {
+        this.subscriptionDate = subscriptionDate;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }
