@@ -8,7 +8,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -95,18 +97,74 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         TextView textView = (TextView) findViewById(R.id.home_nav_text_view);
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        TextView attendance = (TextView) findViewById(R.id.home_attendance_tv);
+        TextView todayInvoice = (TextView) findViewById(R.id.home_today_invoice_tv);
 
+        attendance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, AttendanceActivity.class);
+                intent.putExtra("employee_name",sharedPrefHelper.getSystemUserName());
+                startActivity(intent);
+            }
+        });
+
+        todayInvoice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, InvoiceActivity.class);
+                intent.putExtra("employee_name",sharedPrefHelper.getSystemUserName());
+                startActivity(intent);
+
+            }
+        });
+
+        String userName = sharedPrefHelper.getSystemUserName();
+        if ("ADMIN".equalsIgnoreCase(sharedPrefHelper.getSystemUserRole())) {
+            // Show full name and enable drawer toggle
+            //textView.setText("Menu");
+            textView.setOnClickListener(v -> {
                 if (!mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
                     mDrawerLayout.openDrawer(GravityCompat.START);
                 } else {
                     mDrawerLayout.closeDrawer(GravityCompat.START);
                 }
+            });
 
-            }
-        });
+            // Optional styling for admin
+//            textView.setBackground(null);
+//            textView.setTextColor(Color.parseColor("#000000"));
+            textView.setClickable(true);
+
+        } else {
+            // Disable click
+            //textView.setOnClickListener(null);
+            textView.setClickable(false);
+
+            // Get first character of name
+            String firstChar = userName != null && !userName.isEmpty()
+                    ? userName.substring(0, 1).toUpperCase()
+                    : "?";
+
+            textView.setText(firstChar);
+            textView.setTextColor(Color.WHITE);
+            textView.setGravity(Gravity.CENTER);
+
+            // Create circular background like GPay avatar
+            GradientDrawable circle = new GradientDrawable();
+            circle.setShape(GradientDrawable.OVAL);
+            circle.setColor(Color.parseColor("#1976D2")); // Blue shade, change if needed
+            textView.setBackground(circle);
+
+            // Set size for avatar style
+            int sizeInDp = 40;
+            float scale = textView.getResources().getDisplayMetrics().density;
+            int sizeInPx = (int) (sizeInDp * scale + 0.5f);
+            textView.setWidth(sizeInPx);
+            textView.setHeight(sizeInPx);
+            textView.setTextSize(18);
+            textView.setTypeface(Typeface.DEFAULT_BOLD);
+        }
 
 
         listener = new BillingClickListener() {
@@ -176,6 +234,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             startActivity(i);
         } else if (item.getItemId() == R.id.nav_stocks) {
             i = new Intent(HomeActivity.this, StockActivity.class);
+            startActivity(i);
+        } else if (item.getItemId() == R.id.nav_vendors) {
+            i = new Intent(HomeActivity.this, VendorActivity.class);
             startActivity(i);
         } else if (item.getItemId() == R.id.nav_expense) {
             i = new Intent(HomeActivity.this, ExpenseActivity.class);

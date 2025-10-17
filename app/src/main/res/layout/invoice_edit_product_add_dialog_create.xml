@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <AutoCompleteTextView
+        android:id="@+id/invoice_edit_product_add_name_autocomplete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Select Product"
+        android:inputType="text"
+        android:drawableRight="@drawable/baseline_search_24"
+        android:background="@drawable/edittext_background"
+        android:padding="10dp"/>
+
+    <TextView
+        android:id="@+id/invoice_edit_product_add_price_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Price: ₹0.0"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/invoice_edit_product_add_qty_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Quantity"
+        android:inputType="number"
+        android:background="@drawable/edittext_background"
+        android:padding="10dp"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/invoice_edit_product_add_confirm_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add to Invoice"
+        android:backgroundTint="@color/app_color"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="12dp"/>
+</LinearLayout>

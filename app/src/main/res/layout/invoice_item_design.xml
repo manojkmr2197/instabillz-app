@@ -124,19 +124,38 @@
 
         <!-- Expand/Collapse Button -->
         <LinearLayout
-            android:id="@+id/product_toggle_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:layout_marginTop="6dp">
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/invoice_item_print"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:layout_marginStart="10sp"
+                android:alpha="0.6"
+                android:scaleType="fitCenter"
+                android:src="@drawable/baseline_print_active24" />
 
-            <TextView
-                android:id="@+id/invoice_toggle_products_tv"
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"/>
+
+            <LinearLayout
+                android:id="@+id/product_toggle_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Show Products ▼"
-                android:textColor="@color/app_color"
-                android:textStyle="bold" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/invoice_toggle_products_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Show Products ▼"
+                    android:textColor="@color/app_color"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Expandable Product List -->

@@ -2,8 +2,10 @@ package com.app.billing.instabillz.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +38,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,6 +57,7 @@ public class InvoiceActivity extends AppCompatActivity {
     TextView back;
     Spinner employeeSpinner, dateRangeSpinner;
     Button btnSearch;
+    LinearLayout filterLL;
 
     List<String> employeeList = new ArrayList<>();
 
@@ -103,6 +108,7 @@ public class InvoiceActivity extends AppCompatActivity {
         employeeSpinner = findViewById(R.id.invoice_employees_spinner);
         dateRangeSpinner = findViewById(R.id.invoice_date_range);
         btnSearch = findViewById(R.id.invoice_search);
+        filterLL = (LinearLayout) findViewById(R.id.invoice_filter_ll);
 
 
         // 🔹 Load sample employee names
@@ -180,7 +186,7 @@ public class InvoiceActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please select a date range", Toast.LENGTH_SHORT).show();
                 return;
             }
-
+            Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
             // Call your custom method here
             fetchInvoices(selectedEmployee, selectedRange, selectedDate);
 
@@ -192,9 +198,11 @@ public class InvoiceActivity extends AppCompatActivity {
             @Override
             public void click(int index, String type) {
                 if(type.equalsIgnoreCase("EDIT")){
-
+                    Intent intent = new Intent(context, InvoiceEditActivity.class);
+                    intent.putExtra("invoice", new Gson().toJson(invoiceModelList.get(index))); // pass data as JSON
+                    context.startActivity(intent);
                 }else if(type.equalsIgnoreCase("DELETE")){
-
+                    deleteConfirmationInvoice(index);
                 }
             }
         };
@@ -204,12 +212,75 @@ public class InvoiceActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);
 
+        Intent intent = getIntent();
+        String employeeName = intent.getStringExtra("employee_name");
+        if (StringUtils.isNotBlank(employeeName)) {
+            filterLL.setVisibility(View.GONE);
+            employeeSpinner.setSelection(employeeAdapter.getPosition(employeeName));
+            dateRangeSpinner.setSelection(dateRangeAdapter.getPosition("Today"));
+            Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
+            fetchInvoices(employeeName, "Today", selectedDate);
+        }else{
+            filterLL.setVisibility(View.VISIBLE);
+        }
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(employeeSpinner.getSelectedItem() != null && dateRangeSpinner.getSelectedItem() != null) {
+            fetchInvoices(employeeSpinner.getSelectedItem().toString(), dateRangeSpinner.getSelectedItem().toString(), selectedDate);
+        }
+    }
+
+    private void deleteConfirmationInvoice(int index) {
+        // Create and configure the AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Confirmation");
+        builder.setMessage("Do you want to Delete the Invoice # "+invoiceModelList.get(index).getToken());
+        builder.setCancelable(true);
+
+        // Set positive button
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            dialog.dismiss();
+            try {
+                deleteProductItem(index);
+            } catch (Exception e) {
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Set negative button
+        builder.setNegativeButton("No", (dialog, which) -> {
+            dialog.dismiss();
+        });
+
+        // Create and show the dialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void deleteProductItem(int index) {
+        Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
+        InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.SALES_COLLECTION, String.valueOf(invoiceModelList.get(index).getBillingDate()), new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onSuccess(Object data) {
+                invoiceModelList.remove(index);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @SuppressLint("NotifyDataSetChanged")
     private void fetchInvoices(String selectedEmployee, String selectedRange, String selectedDate) {
-        Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -280,7 +351,7 @@ public class InvoiceActivity extends AppCompatActivity {
         query = query.whereGreaterThanOrEqualTo("billingDate", startEpoch)
                 .whereLessThanOrEqualTo("billingDate", endEpoch);
 
-        query = query.orderBy("token", Query.Direction.DESCENDING);
+        query = query.orderBy("billingDate", Query.Direction.DESCENDING);
         query.get().addOnSuccessListener(queryDocumentSnapshots -> {
             invoiceModelList.clear();
             for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
@@ -316,6 +387,9 @@ public class InvoiceActivity extends AppCompatActivity {
                                 .collect(Collectors.toList())
                 );
                 employeeAdapter.notifyDataSetChanged();
+                if(StringUtils.isNotBlank(getIntent().getStringExtra("employee_name"))) {
+                    employeeSpinner.setSelection(employeeAdapter.getPosition(getIntent().getStringExtra("employee_name")));
+                }
             }
 
             @Override
