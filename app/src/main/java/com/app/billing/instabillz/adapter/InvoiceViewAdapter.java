@@ -72,6 +72,7 @@ public class InvoiceViewAdapter extends RecyclerView.Adapter<InvoiceViewHolder>{
 
         holder.editBtn.setOnClickListener(v -> clickListener.click(position, "EDIT"));
         holder.deleteBtn.setOnClickListener(v -> clickListener.click(position, "DELETE"));
+        holder.printBtn.setOnClickListener(v -> clickListener.click(position, "PRINT"));
 
     }
 

@@ -1,11 +1,15 @@
 package com.app.billing.instabillz.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -20,8 +24,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,7 +38,9 @@ import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.listener.BillingClickListener;
 import com.app.billing.instabillz.model.EmployeeModel;
 import com.app.billing.instabillz.model.InvoiceModel;
+import com.app.billing.instabillz.model.PrinterDataModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
+import com.app.billing.instabillz.utils.BluetoothPrinterHelper;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -50,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class InvoiceActivity extends AppCompatActivity {
@@ -80,6 +90,18 @@ public class InvoiceActivity extends AppCompatActivity {
 
     ZoneOffset istOffset = ZoneOffset.ofHoursMinutes(5, 30);
 
+
+    BluetoothAdapter bluetoothAdapter;
+    public BluetoothPrinterHelper bluetoothPrinterHelper;
+    PrinterDataModel printerDataModel = new PrinterDataModel();
+
+    private static final int REQUEST_WRITE_PERMISSION = 786;
+    private static final int REQUEST_ENABLE_BT = 10;
+    private static final int PERMISSION_BLUETOOTH = 1;
+    private static final int PERMISSION_BLUETOOTH_ADMIN = 2;
+    private static final int PERMISSION_BLUETOOTH_CONNECT = 3;
+    private static final int PERMISSION_BLUETOOTH_SCAN = 4;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,12 +120,13 @@ public class InvoiceActivity extends AppCompatActivity {
         activity = InvoiceActivity.this;
         db = FirebaseFirestore.getInstance();
         sharedPrefHelper = new SharedPrefHelper(context);
-
+        bluetoothPrinterHelper = new BluetoothPrinterHelper(context, activity);
 
         back = (TextView) findViewById(R.id.invoice_back);
         back.setOnClickListener(v -> {
             finish();
         });
+        loadPrinterData();
 
         employeeSpinner = findViewById(R.id.invoice_employees_spinner);
         dateRangeSpinner = findViewById(R.id.invoice_date_range);
@@ -203,6 +226,8 @@ public class InvoiceActivity extends AppCompatActivity {
                     context.startActivity(intent);
                 }else if(type.equalsIgnoreCase("DELETE")){
                     deleteConfirmationInvoice(index);
+                }else if(type.equalsIgnoreCase("PRINT")){
+                    generateHardCopyBill(invoiceModelList.get(index));
                 }
             }
         };
@@ -223,7 +248,147 @@ public class InvoiceActivity extends AppCompatActivity {
         }else{
             filterLL.setVisibility(View.VISIBLE);
         }
+
+        enableBluetooth();
     }
+
+    private void enableBluetooth() {
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (bluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth not supported on this device", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (bluetoothAdapter.isEnabled()) {
+            //Toast.makeText(this, "Bluetooth is already enabled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_BLUETOOTH);
+                return;
+            } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_ADMIN}, PERMISSION_BLUETOOTH_ADMIN);
+                return;
+            } else {
+                // Your Bluetooth logic here
+            }
+        } else {
+            // For Android 12 (S) and above
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, PERMISSION_BLUETOOTH_CONNECT);
+                return;
+            } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, PERMISSION_BLUETOOTH_SCAN);
+                return;
+            } else {
+                // Your Bluetooth logic here
+            }
+        }
+
+        // Permission granted, request to enable Bluetooth
+        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                enableBluetooth(); // Retry enabling Bluetooth
+            } else {
+                Toast.makeText(this, "Bluetooth permission is required", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void generateHardCopyBill(InvoiceModel newInvoice) {
+
+        if (bluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth not supported on this device", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!bluetoothAdapter.isEnabled()) {
+            Toast.makeText(context, "Please turn ON Bluetooth", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_BLUETOOTH);
+                    return;
+                } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_ADMIN}, PERMISSION_BLUETOOTH_ADMIN);
+                    return;
+                } else {
+                    // Your Bluetooth logic here
+                }
+            } else {
+                // For Android 12 (S) and above
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, PERMISSION_BLUETOOTH_CONNECT);
+                    return;
+                } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, PERMISSION_BLUETOOTH_SCAN);
+                    return;
+                } else {
+                    // Your Bluetooth logic here
+                }
+            }
+            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+
+            if (!pairedDevices.isEmpty()) {
+                boolean state = false;
+                for (BluetoothDevice device : pairedDevices) {
+                    if (device.getName().contains(printerDataModel.getPrinterName()) && !state) {
+                        printConfirmationPopup(newInvoice, device.getName());
+                        state = true;
+                    }
+                }
+                if (!state) {
+                    Toast.makeText(context, "Printer not connected properly.!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(context, "No paired devices found", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    private void printConfirmationPopup(InvoiceModel billData, String printer) {
+        // Create and configure the AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirmation (" + printer + ")");
+        builder.setMessage("Do you want to print the bill?");
+        builder.setCancelable(true);
+
+        // Set positive button
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            dialog.dismiss();
+
+            Toast.makeText(context, "Printing.!", Toast.LENGTH_LONG).show();
+            try {
+                bluetoothPrinterHelper.printSmallFontReceipt(billData,printerDataModel);
+
+            } catch (Exception e) {
+                Toast.makeText(context, "Printer not available. Please restart the printer.!", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        // Set negative button
+        builder.setNegativeButton("No", (dialog, which) -> {
+            dialog.dismiss();
+        });
+
+        // Create and show the dialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
+
 
     @Override
     protected void onResume() {
@@ -389,6 +554,24 @@ public class InvoiceActivity extends AppCompatActivity {
                 employeeAdapter.notifyDataSetChanged();
                 if(StringUtils.isNotBlank(getIntent().getStringExtra("employee_name"))) {
                     employeeSpinner.setSelection(employeeAdapter.getPosition(getIntent().getStringExtra("employee_name")));
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void loadPrinterData() {
+        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(AppConstants.SHOP_COLLECTION, AppConstants.APP_NAME, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @Override
+            public void onSuccess(Object data) {
+                DocumentSnapshot doc = (DocumentSnapshot) data;
+                if (doc.exists()) {
+                    printerDataModel = doc.toObject(PrinterDataModel.class);
                 }
             }
 
