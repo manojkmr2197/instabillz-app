@@ -524,7 +524,6 @@ public class InvoiceActivity extends AppCompatActivity {
                 invoiceModelList.add(invoice);
             }
             adapter.notifyDataSetChanged();
-
         }).addOnFailureListener(e -> {
             e.printStackTrace();
             Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();

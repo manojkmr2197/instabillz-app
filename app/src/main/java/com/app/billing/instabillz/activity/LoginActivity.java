@@ -113,10 +113,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        btnLogin.setOnClickListener(v -> handleLogin());
+        btnLogin.setOnClickListener(v -> loadPrinterData());
         tvDifferentUser.setOnClickListener(v -> clearSharedPref());
-
-        loadPrinterData();
 
     }
 
@@ -212,7 +210,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void showSubscriptionErrorDialog() {
-        Dialog dialog = new Dialog(this);
+        Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_subscription_error);
         dialog.setCancelable(false);
@@ -259,6 +257,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (!today.isAfter(subscriptionDate)) {
                             // Subscription still valid
                             sharedPrefHelper.setPrinterDetails(printerDataModel);
+                            handleLogin();
                         } else {
                             // Subscription expired
                             showSubscriptionErrorDialog();

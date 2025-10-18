@@ -31,10 +31,10 @@
         android:id="@+id/tvMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Your app subscription has expired. Please contact the administrator for renewal or support."
+        android:text="Your access period is over. Contact admin to reactivate."
         android:textAlignment="center"
         android:textColor="#444444"
-        android:textSize="16sp"
+        android:textSize="13sp"
         android:layout_marginBottom="16dp" />
 
     <!-- Clickable Phone Number -->

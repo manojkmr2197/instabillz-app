@@ -2,6 +2,7 @@ package com.app.billing.instabillz.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -62,7 +63,8 @@ public class EmployeeReportActivity extends AppCompatActivity {
     FirebaseFirestore db;
     SharedPrefHelper sharedPrefHelper;
 
-
+    String employeeName ="";
+    String dateRange ="Today";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,7 +144,8 @@ public class EmployeeReportActivity extends AppCompatActivity {
             @Override
             public void click(int index, String type) {
                 if(type.equalsIgnoreCase("DELETE")){
-                    removeAttendanceItem(index);
+                    deleteConfirmationPopUp(index);
+
                 }
             }
         };
@@ -154,9 +157,9 @@ public class EmployeeReportActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         Intent intent = getIntent();
-        String employeeName = intent.getStringExtra("employee_name");
+        employeeName = intent.getStringExtra("employee_name");
         if (StringUtils.isNotBlank(employeeName)) {
-            String dateRange = "Today";
+            dateRange = "Today";
             dateRangeSpinner.setSelection(dateRangeAdapter.getPosition(dateRange));
             employeeSpinner.setSelection(employeeAdapter.getPosition(employeeName));
             fetchAttendance(employeeName, dateRange);
@@ -182,6 +185,37 @@ public class EmployeeReportActivity extends AppCompatActivity {
         });
     }
 
+    private void deleteConfirmationPopUp(int position) {
+        // Create and configure the AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Confirmation");
+        String message = "Do you want to remove the attendance?\n\n" +
+                "👤 Employee: " + attendanceModelList.get(position).getEmployeeName() + "\n" +
+                "📅 Date: " + attendanceModelList.get(position).getDate();
+        builder.setMessage(message);
+        builder.setCancelable(true);
+
+        // Set positive button
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            dialog.dismiss();
+            try {
+                removeAttendanceItem(position);
+            } catch (Exception e) {
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Set negative button
+        builder.setNegativeButton("No", (dialog, which) -> {
+            dialog.dismiss();
+        });
+
+        // Create and show the dialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
+
     private void loadEmployeeList() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
         InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.EMPLOYEE_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
@@ -189,6 +223,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Object data) {
                 employeeList.clear();
+                employeeList.add("ALL");
                 List<EmployeeModel> employees = new ArrayList<>();
                 QuerySnapshot documentSnapshotList = (QuerySnapshot) data;
                 for (DocumentSnapshot doc : documentSnapshotList) {
@@ -201,6 +236,10 @@ public class EmployeeReportActivity extends AppCompatActivity {
                                 .collect(Collectors.toList())
                 );
                 employeeAdapter.notifyDataSetChanged();
+                if(StringUtils.isNotBlank(employeeName)){
+                    employeeSpinner.setSelection(employeeAdapter.getPosition(employeeName));
+                    fetchAttendance(employeeName, dateRange);
+                }
             }
 
             @Override
@@ -275,7 +314,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
         // 🔹 Build the query
         Query query = db.collection(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION);
 
-        if (!employeeName.equals("Select Employee")) {
+        if (!employeeName.equals("Select Employee") && !employeeName.equals("ALL")) {
             query = query.whereEqualTo("employeeName", employeeName);
         }
 

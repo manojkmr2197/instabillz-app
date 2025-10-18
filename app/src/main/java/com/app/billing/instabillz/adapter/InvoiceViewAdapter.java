@@ -66,9 +66,9 @@ public class InvoiceViewAdapter extends RecyclerView.Adapter<InvoiceViewHolder>{
             } else {
                 holder.productListLayout.setVisibility(View.VISIBLE);
                 holder.toggleProductsTv.setText("Hide Products ▲");
-                loadProducts(holder.productListLayout, invoice.getProductModelList());
             }
         });
+        loadProducts(holder.productListLayout, invoice.getProductModelList());
 
         holder.editBtn.setOnClickListener(v -> clickListener.click(position, "EDIT"));
         holder.deleteBtn.setOnClickListener(v -> clickListener.click(position, "DELETE"));
@@ -88,7 +88,7 @@ public class InvoiceViewAdapter extends RecyclerView.Adapter<InvoiceViewHolder>{
         return sdf.format(date);
     }
 
-    private void loadProducts(LinearLayout container, List<ProductModel> productList) {
+    public void loadProducts(LinearLayout container, List<ProductModel> productList) {
         container.removeAllViews();
         for (ProductModel product : productList) {
             View productView = LayoutInflater.from(context).inflate(R.layout.invoice_item_product_design, container, false);

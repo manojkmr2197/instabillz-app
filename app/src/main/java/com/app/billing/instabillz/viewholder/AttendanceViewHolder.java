@@ -11,11 +11,12 @@ import com.app.billing.instabillz.R;
 
 public class AttendanceViewHolder extends RecyclerView.ViewHolder{
 
-    public TextView date,loginTime,logoutTime,hours;
+    public TextView name,date,loginTime,logoutTime,hours;
     public Button delete;
 
     public AttendanceViewHolder(@NonNull View itemView) {
         super(itemView);
+        name = (TextView) itemView.findViewById(R.id.attendance_emp_name);
         date = (TextView) itemView.findViewById(R.id.attendance_emp_date);
         loginTime = (TextView) itemView.findViewById(R.id.attendance_emp_login);
         logoutTime = (TextView) itemView.findViewById(R.id.attendance_emp_logout);

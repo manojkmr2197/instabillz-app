@@ -4,11 +4,8 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:paddingVertical="8dp"
     android:background="#FFFFFF"
-    android:gravity="center"
-    android:weightSum="4"
-    android:paddingHorizontal="6dp">
+    android:gravity="center">
 
     <Button
         android:id="@+id/attendance_emp_delete"
@@ -20,43 +17,53 @@
         android:background="@drawable/ic_baseline_clear_24" />
 
     <TextView
-        android:id="@+id/attendance_emp_date"
+        android:id="@+id/attendance_emp_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:text="MANOJ"
+        android:textColor="#212121"
+        android:gravity="left"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/attendance_emp_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
         android:text="2025-10-11"
         android:textColor="#212121"
         android:gravity="center"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/attendance_emp_login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="0.6"
         android:text="09:15"
         android:textColor="#212121"
         android:gravity="center"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/attendance_emp_logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="0.6"
         android:text="17:45"
         android:textColor="#212121"
         android:gravity="center"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/attendance_emp_hours"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="0.8"
         android:text="8h 30m"
         android:textColor="#205C9B"
         android:textStyle="bold"
         android:gravity="center"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 </LinearLayout>

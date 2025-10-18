@@ -1,163 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <!-- Heading -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp">
+
+            <TextView
+                android:id="@+id/invoice_report_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_baseline_arrow_back_24" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="InstaBillz"
+                    android:textColor="@color/app_color"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Complete your business with ease"
+                    android:textColor="@color/app_color"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/invoice_report_download"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:background="@drawable/baseline_arrow_circle_down_24" />
+
+        </LinearLayout>
+
+        <!-- Filter Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/spinnerDateRange"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/spinner_bg"
+                android:padding="5dp"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/tvCustomRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="No custom range"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:paddingEnd="5dp"
-        android:paddingStart="5dp">
+        android:paddingStart="5dp"
+        android:paddingTop="3dp"
+        android:background="#eee"
+        android:paddingEnd="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Heading -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="70dp">
-
-                <TextView
-                    android:id="@+id/invoice_report_back"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/ic_baseline_arrow_back_24" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="InstaBillz"
-                        android:textColor="@color/app_color"
-                        android:textSize="20sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Complete your business with ease"
-                        android:textColor="@color/app_color"
-                        android:textSize="10sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/invoice_report_download"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/baseline_arrow_circle_down_24" />
-
-            </LinearLayout>
-
-            <!-- Filter Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingBottom="8dp">
-
-                <Spinner
-                    android:id="@+id/spinnerDateRange"
-                    android:layout_width="0dp"
-                    android:background="@drawable/spinner_bg"
-                    android:layout_height="wrap_content"
-                    android:textAlignment="center"
-                    android:padding="5dp"
-                    android:layout_weight="1" />
-
-                <TextView
-                    android:id="@+id/tvCustomRange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="No custom range"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-
             <!-- Summary cards -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:orientation="horizontal"
-                android:weightSum="3"
-                android:layout_marginBottom="8dp">
+                android:weightSum="3">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="10dp"
                     android:background="@drawable/card_bg"
-                    android:layout_marginEnd="6dp">
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
                     <TextView
+                        android:id="@+id/tvTotalInvoices"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/tvTotalInvoices"
                         android:text="Invoices"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/tvTotalInvoicesValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="10dp"
                     android:background="@drawable/card_bg"
-                    android:layout_marginEnd="6dp">
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Revenue"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/tvRevenueValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₹0"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="@drawable/card_bg"
                     android:orientation="vertical"
-                    android:padding="10dp"
-                    android:background="@drawable/card_bg">
+                    android:padding="10dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="UPI / Cash"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/tvPaymentSplit"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="UPI:0 Cash:0"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -165,50 +179,54 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:orientation="horizontal"
-                android:weightSum="2"
-                android:layout_marginBottom="8dp">
+                android:weightSum="2">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="10dp"
                     android:background="@drawable/card_bg"
-                    android:layout_marginEnd="6dp">
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="UPI"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/tvRevenueUpiValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₹0"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="10dp"
                     android:background="@drawable/card_bg"
-                    android:layout_marginEnd="6dp">
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="CASH"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/tvRevenueCashValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₹0"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -216,9 +234,10 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
                 android:text="Tokens per Day"
-                android:textStyle="bold"
-                android:layout_marginTop="6dp"/>
+                android:textStyle="bold" />
+
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/barChartTokens"
                 android:layout_width="match_parent"
@@ -229,29 +248,31 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:text="Top Products"
-                android:textStyle="bold"
-                android:layout_marginTop="12dp"/>
-            <com.github.mikephil.charting.charts.HorizontalBarChart
+                android:textStyle="bold" />
+
+            <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/hbarTopProducts"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_marginTop="6dp"/>
+                android:layout_height="400dp" />
+
 
             <!-- Product list summary (recycler) -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:text="Products (qty)"
-                android:textStyle="bold"
-                android:layout_marginTop="12dp"/>
+                android:textStyle="bold" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvProducts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:layout_marginTop="6dp"/>
+                android:layout_marginTop="6dp"
+                android:nestedScrollingEnabled="false" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

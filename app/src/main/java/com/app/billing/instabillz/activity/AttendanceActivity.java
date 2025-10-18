@@ -108,7 +108,6 @@ public class AttendanceActivity extends AppCompatActivity {
 
         spinnerEmployees = findViewById(R.id.attendance_employees_spinner);
 
-        loadEmployeesFromFirestore();
 
         Intent intent = getIntent();
         String employeeName = intent.getStringExtra("employee_name");
@@ -117,6 +116,8 @@ public class AttendanceActivity extends AppCompatActivity {
             selectedDate = StringUtils.isNotBlank(intent.getStringExtra("date")) ? intent.getStringExtra("date") : selectedDate;
             filterLL.setVisibility(View.GONE);
             loadEmployeeData();
+        }else{
+            loadEmployeesFromFirestore();
         }
 
     }
@@ -186,7 +187,7 @@ public class AttendanceActivity extends AppCompatActivity {
                 });
             }
 
-        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
 
         dialog.show();
     }
@@ -286,7 +287,6 @@ public class AttendanceActivity extends AppCompatActivity {
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, employees);
                 spinnerEmployees.setAdapter(adapter);
-
                 spinnerEmployees.setSelection(0);
                 resetUI();
 

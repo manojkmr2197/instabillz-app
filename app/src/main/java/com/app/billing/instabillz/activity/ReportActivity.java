@@ -39,9 +39,11 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -68,7 +70,7 @@ public class ReportActivity extends AppCompatActivity {
     private Spinner spinnerDateRange;
     private TextView tvCustomRange, tvTotalInvoicesValue, tvRevenueValue, tvPaymentSplit, back,download, tvUpiValue, tvCashValue;
     private BarChart barChartTokens;
-    private HorizontalBarChart hbarTopProducts;
+    private BarChart hbarTopProducts;
     private RecyclerView rvProducts;
 
     // Data
@@ -319,20 +321,37 @@ public class ReportActivity extends AppCompatActivity {
 
     // -------------------- Charts & list render --------------------
     private void renderTokensBarChart() {
-        List<String> labels = new ArrayList<>(tokensPerDay.keySet()).stream().sorted().collect(Collectors.toList());
+        List<String> labels = new ArrayList<>(tokensPerDay.keySet()).stream()
+                .sorted()
+                .collect(Collectors.toList());
+
         List<BarEntry> entries = new ArrayList<>();
         for (int i = 0; i < labels.size(); i++) {
             entries.add(new BarEntry(i, tokensPerDay.get(labels.get(i))));
         }
-        BarDataSet set = new BarDataSet(entries, "Tokens/day");
+
+        BarDataSet set = new BarDataSet(entries, "Tokens / Day");
         set.setColor(getResources().getColor(android.R.color.holo_blue_dark));
+
         BarData data = new BarData(set);
         data.setBarWidth(0.9f);
+        data.setValueTextSize(12f);
+        data.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.valueOf((int) value); // ✅ Show whole numbers only
+            }
+        });
+
         barChartTokens.setData(data);
 
-        barChartTokens.getXAxis().setValueFormatter(new ValueFormatter() {
+        // ✅ X Axis setup
+        XAxis xAxis = barChartTokens.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f); // Prevents decimals between bars
+        xAxis.setValueFormatter(new ValueFormatter() {
             @Override
-            public String getFormattedValue(float value, AxisBase axis) {
+            public String getFormattedValue(float value) {
                 int idx = (int) value;
                 if (idx >= 0 && idx < labels.size()) {
                     return labels.get(idx);
@@ -340,51 +359,102 @@ public class ReportActivity extends AppCompatActivity {
                 return "";
             }
         });
-        barChartTokens.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        // ✅ Y Axis setup (round off Y labels)
+        YAxis leftAxis = barChartTokens.getAxisLeft();
+        leftAxis.setGranularity(1f);
+        leftAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.valueOf((int) value);
+            }
+        });
+
+        barChartTokens.getAxisRight().setEnabled(false);
         barChartTokens.getDescription().setEnabled(false);
-        barChartTokens.invalidate();
+        barChartTokens.getLegend().setTextSize(12f);
+        barChartTokens.invalidate(); // Refresh chart
     }
 
+
     private void renderTopProductsChartAndList() {
-        // sort products by qty desc
+        // ✅ Sort products by quantity descending
         List<Map.Entry<String, Integer>> list = new ArrayList<>(productTotals.entrySet());
         list.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
-        // top 20
-        List<Map.Entry<String, Integer>> top = list.stream().limit(20).collect(Collectors.toList());
+        // ✅ Top 20 products
+        List<Map.Entry<String, Integer>> top = list.stream()
+                .limit(20)
+                .collect(Collectors.toList());
 
-        // horizontal bar: build entries reversed so highest top shows top
+        // ✅ Build entries for chart
         List<BarEntry> entries = new ArrayList<>();
         final List<String> labels = new ArrayList<>();
         for (int i = 0; i < top.size(); i++) {
-            // invert index so chart shows top at top (optional)
-            entries.add(new BarEntry(i, top.get(i).getValue()));
-            labels.add(top.get(i).getKey());
+            entries.add(new BarEntry(i, top.get(i).getValue())); // X=index, Y=qty
+            labels.add(top.get(i).getKey()); // product name
         }
+
+        // ✅ Create dataset
         BarDataSet set = new BarDataSet(entries, "Top Products");
         set.setColor(getResources().getColor(android.R.color.holo_orange_dark));
-        BarData data = new BarData(set);
-        data.setBarWidth(0.7f);
-        hbarTopProducts.setData(data);
-        hbarTopProducts.getXAxis().setValueFormatter(new ValueFormatter() {
+        set.setValueTextSize(12f);
+        set.setValueFormatter(new ValueFormatter() {
             @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                int idx = (int) value;
-                if (idx >= 0 && idx < labels.size()) {
-                    return labels.get(idx);
-                }
-                return "";
+            public String getFormattedValue(float value) {
+                return String.valueOf((int) value); // show whole numbers
             }
         });
 
-        hbarTopProducts.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        // ✅ Prepare data and assign to chart
+        BarData data = new BarData(set);
+        data.setBarWidth(0.7f);
+        hbarTopProducts.setData(data);
+
+        // ✅ Configure X Axis (Product names)
+        XAxis xAxis = hbarTopProducts.getXAxis();
+        xAxis.setGranularity(1f);
+        xAxis.setLabelCount(labels.size());
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setLabelRotationAngle(-45); // rotate labels for visibility
+        xAxis.setTextSize(10f);
+        xAxis.setAvoidFirstLastClipping(true);
+
+        // ✅ Configure Y Axis (Quantities)
+        YAxis leftAxis = hbarTopProducts.getAxisLeft();
+        leftAxis.setGranularity(1f);
+        leftAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.valueOf((int) value);
+            }
+        });
+        leftAxis.setDrawGridLines(true);
+
+        // ✅ Disable right Y Axis
+        hbarTopProducts.getAxisRight().setEnabled(false);
+
+        // ✅ Disable chart description
         hbarTopProducts.getDescription().setEnabled(false);
+
+        // ✅ Legend & animation
+        hbarTopProducts.getLegend().setTextSize(12f);
+        hbarTopProducts.animateY(1000);
+
+        // ✅ Refresh chart
         hbarTopProducts.invalidate();
 
-        // update product recycler list to show product + qty
-        List<ProductSummary> summary = list.stream().map(e -> new ProductSummary(e.getKey(), e.getValue())).collect(Collectors.toList());
+        // ✅ Update RecyclerView list
+        List<ProductSummary> summary = top.stream()
+                .map(e -> new ProductSummary(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
         productsAdapter.updateData(summary);
     }
+
+
+
 
     // -------------------- Helper classes --------------------
     // Simple adapter for product summary list

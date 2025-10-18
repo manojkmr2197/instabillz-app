@@ -19,7 +19,7 @@ import com.app.billing.instabillz.utils.SingleTon;
 public class MainActivity extends AppCompatActivity {
 
 
-    private static int TIME_OUT = 500;
+    private static int TIME_OUT = 2500;
     private boolean isNavigated = false;
 
     ImageView ownerLogo, partnershipIcon, clientLogo;
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (checkInternet()) {
             startSplashAnimation();
+            navigateToLogin();
         } else {
             finish();
         }
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                                         .translationYBy(-100f)
                                         .alpha(1f)
                                         .setDuration(500)
-                                        .withEndAction(this::navigateToLogin) // ✅ Only navigate once
+                                        .withEndAction(this::animationNavigate) // ✅ Only navigate once
                                         .start();
 
                             }).start();
@@ -88,9 +89,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateToLogin() {
-        if (isNavigated) return; // ✅ Prevent duplicate navigation
-        isNavigated = true;
-
         new Handler().postDelayed(() -> {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -98,6 +96,12 @@ public class MainActivity extends AppCompatActivity {
             finish();
 
         }, TIME_OUT);
+    }
+
+    private void animationNavigate() {
+        if (isNavigated) return; // ✅ Prevent duplicate navigation
+        isNavigated = true;
+
     }
 
 }

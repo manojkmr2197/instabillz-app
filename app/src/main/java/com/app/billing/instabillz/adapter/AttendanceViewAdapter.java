@@ -1,5 +1,6 @@
 package com.app.billing.instabillz.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +41,7 @@ public class AttendanceViewAdapter extends RecyclerView.Adapter<AttendanceViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AttendanceViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AttendanceViewHolder holder, @SuppressLint("RecyclerView") int position) {
 
         AttendanceModel attendanceModel = attendanceModelList.get(position);
 
@@ -55,13 +56,20 @@ public class AttendanceViewAdapter extends RecyclerView.Adapter<AttendanceViewHo
             holder.delete.setVisibility(View.GONE);
         }
 
-        holder.delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.click(position,"DELETE");
-            }
-        });
-
+        if(StringUtils.isNotBlank(attendanceModel.getEmployeeName())){
+            holder.delete.setVisibility(View.VISIBLE);
+            holder.name.setText(attendanceModel.getEmployeeName());
+            holder.delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.click(position,"DELETE");
+                }
+            });
+        }else{
+            holder.delete.setVisibility(View.INVISIBLE);
+            holder.delete.setClickable(false);
+            holder.name.setText("Name");
+        }
     }
 
     @Override

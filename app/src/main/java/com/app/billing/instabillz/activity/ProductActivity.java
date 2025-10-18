@@ -280,7 +280,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
             InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, newProductModel.getId(), newProductModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                 @Override
                 public void onSuccess(Object orderId) {
-                    Toast.makeText(context, "New product Added", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Products Updated", Toast.LENGTH_LONG).show();
                     loadProductList();
                 }
 
