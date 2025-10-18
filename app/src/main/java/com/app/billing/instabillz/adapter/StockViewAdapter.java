@@ -39,6 +39,22 @@ public class StockViewAdapter extends RecyclerView.Adapter<StockViewHolder>{
     public void onBindViewHolder(@NonNull StockViewHolder holder, int position) {
         holder.name.setText(itemList.get(position).getName());
         holder.qty.setText(itemList.get(position).getQuantity()+" "+itemList.get(position).getUnit());
+
+        if(itemList.get(position).getVendorModel() != null){
+            holder.vendorName.setText(itemList.get(position).getVendorModel().getName());
+            holder.vendorPhone.setText(itemList.get(position).getVendorModel().getPhone());
+
+            holder.vendorPhone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickListener.click(position,"PHONE");
+                }
+            });
+        }else{
+            holder.vendorName.setVisibility(View.GONE);
+            holder.vendorPhone.setVisibility(View.GONE);
+        }
+
         holder.load.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

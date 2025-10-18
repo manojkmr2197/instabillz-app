@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,6 +41,7 @@ import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.listener.BillingClickListener;
 import com.app.billing.instabillz.model.ProductModel;
 import com.app.billing.instabillz.model.StockModel;
+import com.app.billing.instabillz.model.VendorModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.ReportGenerator;
 import com.app.billing.instabillz.utils.SingleTon;
@@ -67,6 +69,8 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
     List<StockModel> stocks;
     StockViewAdapter adapter;
     BillingClickListener listener;
+
+    List<VendorModel> vendorList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +104,9 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
+        vendorList = new ArrayList<>();
+        loadVendorList();
+
         recyclerView = (RecyclerView) findViewById(R.id.stock_recyclerView);
 
         listener = new BillingClickListener() {
@@ -111,6 +118,10 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
                     showQuantityDialog(filteredList.get(index), type);
                 } else if (type.equalsIgnoreCase("DELETE")) {
                     deleteConfirmationPopUp(filteredList.get(index));
+                } else if (type.equalsIgnoreCase("PHONE")) {
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(Uri.parse("tel:" + filteredList.get(index).getVendorModel().getPhone()));
+                    context.startActivity(intent);
                 }
             }
         };
@@ -316,6 +327,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
         View sheetView = getLayoutInflater().inflate(R.layout.dialog_stock_create, null);
         dialog.setContentView(sheetView);
         dialog.setCanceledOnTouchOutside(false);
+        final VendorModel[] selectedVendor = {null};
 
         // Transparent background for rounded corners
         if (dialog.getWindow() != null) {
@@ -348,6 +360,17 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
         stockAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         scaleSpinner.setAdapter(stockAdapter);
 
+        Spinner vendorSpinner = sheetView.findViewById(R.id.stock_create_vendor);
+
+
+        ArrayAdapter<VendorModel> vendorAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                vendorList);
+
+        vendorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        vendorSpinner.setAdapter(vendorAdapter);
+
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -355,6 +378,18 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
                 dialog.dismiss();
             }
         });
+
+        vendorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedVendor[0] = vendorList.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -378,6 +413,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
                 stockModel.setName(nameValue);
                 stockModel.setUnit(scale);
                 stockModel.setQuantity(Integer.parseInt(qtyValue));
+                stockModel.setVendorModel(selectedVendor[0]);
 
                 InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.STOCKS_COLLECTION, stockModel.getId(), stockModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
@@ -436,5 +472,26 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
         intent.setDataAndType(fileUri, "application/vnd.ms-excel");
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(intent);
+    }
+
+    private void loadVendorList() {
+        Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
+        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.VENDOR_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onSuccess(Object data) {
+                vendorList.clear();
+                QuerySnapshot documentSnapshotList = (QuerySnapshot) data;
+                for (DocumentSnapshot doc : documentSnapshotList) {
+                    vendorList.add(doc.toObject(VendorModel.class));
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

@@ -64,13 +64,36 @@
             android:inputType="number"
             android:textSize="16sp" />
 
-        <androidx.appcompat.widget.AppCompatSpinner
+        <Spinner
             android:id="@+id/stock_create_qty_scale"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"
+            android:padding="8dp"
+            android:layout_marginEnd="5dp"
+            android:textAlignment="center"
+            android:background="@drawable/spinner_bg"
             android:layout_weight="1"/>
 
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_gravity="center"
+        android:text="Choose Vendor"
+        android:textColor="@color/app_color"
+        android:textSize="15sp" />
+
+    <Spinner
+        android:id="@+id/stock_create_vendor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown"
+        android:padding="8dp"
+        android:layout_margin="5dp"
+        android:background="@drawable/spinner_bg" />
 
 
     <LinearLayout
@@ -96,7 +119,6 @@
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_weight="1" />
-
 
     </LinearLayout>
 

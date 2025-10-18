@@ -11,7 +11,7 @@ import com.app.billing.instabillz.R;
 
 public class StockViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView name,qty;
+    public TextView name,qty,vendorName,vendorPhone;
     public Button close,load,unLoad;
 
     public StockViewHolder(@NonNull View itemView) {
@@ -21,5 +21,7 @@ public class StockViewHolder extends RecyclerView.ViewHolder {
         unLoad = (Button) itemView.findViewById(R.id.stock_item_unload);
         name = (TextView) itemView.findViewById(R.id.stock_item_name);
         qty = (TextView) itemView.findViewById(R.id.stock_item_qty);
+        vendorName = (TextView) itemView.findViewById(R.id.stock_item_vendor_name);
+        vendorPhone = (TextView) itemView.findViewById(R.id.stock_item_vendor_phone);
     }
 }

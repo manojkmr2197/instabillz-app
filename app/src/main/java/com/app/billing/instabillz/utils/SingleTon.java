@@ -81,8 +81,8 @@ public class SingleTon {
         return "STOCK-"+ UUID.randomUUID().toString();
     }
 
-    public static final String generateInvoiceDetailDocument(){
-        return "INVOICE-"+ UUID.randomUUID().toString();
+    public static final String generateVendorDocument(){
+        return "VENDOR-"+ UUID.randomUUID().toString();
     }
 
     public static final String generateExpenseDetailDocument(){

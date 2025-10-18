@@ -150,7 +150,6 @@ public class EmployeeActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", (dialog, which) -> {
             dialog.dismiss();
             try {
-                Toast.makeText(context, "Refreshing.!", Toast.LENGTH_LONG).show();
                 deleteDBItem(employeeModel.getId());
             } catch (Exception e) {
                 Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
@@ -193,6 +192,7 @@ public class EmployeeActivity extends AppCompatActivity {
             public void onSuccess(Object data) {
                 employees.clear();
                 filteredList.clear();
+                search.setText("");
                 QuerySnapshot documentSnapshotList = (QuerySnapshot) data;
                 for (DocumentSnapshot doc : documentSnapshotList) {
                     employees.add(doc.toObject(EmployeeModel.class));

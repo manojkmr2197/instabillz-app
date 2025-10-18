@@ -8,6 +8,7 @@ public class StockModel {
     private int quantity;
     private String unit;
     private Timestamp timestamp;
+    private VendorModel vendorModel;
 
     public String getUnit() {
         return unit;
@@ -49,4 +50,11 @@ public class StockModel {
         this.timestamp = timestamp;
     }
 
+    public VendorModel getVendorModel() {
+        return vendorModel;
+    }
+
+    public void setVendorModel(VendorModel vendorModel) {
+        this.vendorModel = vendorModel;
+    }
 }
