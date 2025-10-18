@@ -16,41 +16,70 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="5dp"
-            android:text="Add Product"
+            android:text="Add Expense"
             android:textColor="@color/white"
             android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/product_create_close"
+            android:id="@+id/expense_create_close"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@drawable/ic_baseline_close_24" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:id="@+id/expense_create_type_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/spinner_bg"
+            android:padding="8dp"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/expense_create_date"
+            android:layout_weight="1"
+            android:text="Select Date"
+            android:textColor="@color/app_color"
+            android:background="@drawable/spinner_bg"
+            android:padding="8dp"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
     <EditText
-        android:id="@+id/product_create_name"
+        android:id="@+id/expense_create_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5sp"
         android:background="@drawable/search_bg"
         android:completionThreshold="1"
         android:dropDownHeight="200dp"
-        android:hint="Enter Product Name"
-        android:padding="12dp"
-        android:textAllCaps="true"
+        android:hint="Enter Description"
         android:inputType="textCapCharacters"
+        android:padding="12dp"
         android:singleLine="true"
+        android:textAllCaps="true"
         android:textSize="16sp" />
 
     <EditText
-        android:id="@+id/product_create_price"
+        android:id="@+id/expense_create_price"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5sp"
         android:background="@drawable/search_bg"
         android:completionThreshold="1"
         android:dropDownHeight="200dp"
-        android:hint="Enter Product Price"
+        android:hint="Enter Expense Amount"
         android:padding="12dp"
         android:inputType="number"
         android:singleLine="true"
@@ -68,7 +97,7 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/product_create_submit"
+            android:id="@+id/expense_create_submit"
             android:layout_width="200sp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -81,11 +110,6 @@
             android:layout_height="1dp"
             android:layout_weight="1" />
 
-        <TextView
-            android:id="@+id/product_create_delete"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/baseline_delete_24" />
     </LinearLayout>
 
 </LinearLayout>

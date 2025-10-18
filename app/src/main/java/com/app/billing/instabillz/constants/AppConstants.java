@@ -13,6 +13,7 @@ public class AppConstants {
     public static final String EMPLOYEE_COLLECTION = "_employee";
     public static final String VENDOR_COLLECTION = "_vendors";
     public static final String SALES_COLLECTION = "_sales";
+    public static final String EXPENSE_COLLECTION = "_expenses";
 
     public static final String SHOP_COLLECTION = "shops";
 
