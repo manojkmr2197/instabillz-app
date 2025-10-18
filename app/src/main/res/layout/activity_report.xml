@@ -33,7 +33,6 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_marginEnd="50dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -53,6 +52,14 @@
                         android:textSize="10sp" />
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/invoice_report_download"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/baseline_arrow_circle_down_24" />
+
             </LinearLayout>
 
             <!-- Filter Row -->
@@ -66,7 +73,10 @@
                 <Spinner
                     android:id="@+id/spinnerDateRange"
                     android:layout_width="0dp"
+                    android:background="@drawable/spinner_bg"
                     android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:padding="5dp"
                     android:layout_weight="1" />
 
                 <TextView
@@ -148,6 +158,57 @@
                         android:layout_height="wrap_content"
                         android:text="UPI:0 Cash:0"
                         android:textSize="14sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Payment cards -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="10dp"
+                    android:background="@drawable/card_bg"
+                    android:layout_marginEnd="6dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="UPI"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:id="@+id/tvRevenueUpiValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹0"
+                        android:textSize="18sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="10dp"
+                    android:background="@drawable/card_bg"
+                    android:layout_marginEnd="6dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CASH"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:id="@+id/tvRevenueCashValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹0"
+                        android:textSize="18sp"/>
                 </LinearLayout>
             </LinearLayout>
 

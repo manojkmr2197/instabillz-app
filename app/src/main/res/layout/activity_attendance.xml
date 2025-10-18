@@ -56,7 +56,9 @@
             android:id="@+id/attendance_employees_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="#205C9B" />
+            android:textAlignment="center"
+            android:padding="5dp"
+            android:background="@drawable/spinner_bg" />
 
     </LinearLayout>
 

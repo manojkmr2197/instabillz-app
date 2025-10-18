@@ -62,7 +62,7 @@
                 android:padding="8dp"
                 android:text="Vendor List"
                 android:textColor="@color/black"
-                android:textSize="22sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView

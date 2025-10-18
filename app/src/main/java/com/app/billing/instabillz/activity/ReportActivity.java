@@ -1,9 +1,11 @@
 package com.app.billing.instabillz.activity;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,6 +23,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -31,6 +34,7 @@ import com.app.billing.instabillz.R;
 import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.model.InvoiceModel;
 import com.app.billing.instabillz.model.ProductModel;
+import com.app.billing.instabillz.utils.ReportGenerator;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -62,7 +66,7 @@ import java.util.stream.Collectors;
 public class ReportActivity extends AppCompatActivity {
 
     private Spinner spinnerDateRange;
-    private TextView tvCustomRange, tvTotalInvoicesValue, tvRevenueValue, tvPaymentSplit,back;
+    private TextView tvCustomRange, tvTotalInvoicesValue, tvRevenueValue, tvPaymentSplit, back,download, tvUpiValue, tvCashValue;
     private BarChart barChartTokens;
     private HorizontalBarChart hbarTopProducts;
     private RecyclerView rvProducts;
@@ -73,6 +77,7 @@ public class ReportActivity extends AppCompatActivity {
     private Map<String, Integer> tokensPerDay = new HashMap<>();
     private Map<String, Integer> productTotals = new HashMap<>();
     private int upiCount = 0, cashCount = 0;
+    private double upiValue,cashValue;
     private double totalRevenue = 0;
 
     // For custom range
@@ -104,15 +109,26 @@ public class ReportActivity extends AppCompatActivity {
         tvTotalInvoicesValue = findViewById(R.id.tvTotalInvoicesValue);
         tvRevenueValue = findViewById(R.id.tvRevenueValue);
         tvPaymentSplit = findViewById(R.id.tvPaymentSplit);
+        tvUpiValue = findViewById(R.id.tvRevenueUpiValue);
+        tvCashValue = findViewById(R.id.tvRevenueCashValue);
+        tvPaymentSplit = findViewById(R.id.tvPaymentSplit);
         barChartTokens = findViewById(R.id.barChartTokens);
         hbarTopProducts = findViewById(R.id.hbarTopProducts);
         rvProducts = findViewById(R.id.rvProducts);
         back = findViewById(R.id.invoice_report_back);
+        download = findViewById(R.id.invoice_report_download);
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                downloadReportList();
             }
         });
 
@@ -246,8 +262,8 @@ public class ReportActivity extends AppCompatActivity {
             InvoiceModel inv = doc.toObject(InvoiceModel.class);
             if (inv != null) invoices.add(inv);
         }
-        if(invoices.isEmpty()){
-            Toast.makeText(this,"No Invoices Found",Toast.LENGTH_SHORT).show();
+        if (invoices.isEmpty()) {
+            Toast.makeText(this, "No Invoices Found", Toast.LENGTH_SHORT).show();
         }
         computeMetricsAndRender();
     }
@@ -258,6 +274,9 @@ public class ReportActivity extends AppCompatActivity {
         upiCount = 0;
         cashCount = 0;
         totalRevenue = 0;
+        upiValue=0;
+        cashValue=0;
+
 
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -267,8 +286,13 @@ public class ReportActivity extends AppCompatActivity {
             String dateKey = date.format(df);
             tokensPerDay.put(dateKey, tokensPerDay.getOrDefault(dateKey, 0) + 1);
 
-            if ("UPI".equalsIgnoreCase(inv.getPaymentMode())) upiCount++;
-            else cashCount++;
+            if ("UPI".equalsIgnoreCase(inv.getPaymentMode())) {
+                upiCount++;
+                upiValue = upiValue+inv.getSellingCost();
+            } else {
+                cashCount++;
+                cashValue = cashValue+inv.getSellingCost();
+            }
             if (inv.getSellingCost() != null) totalRevenue += inv.getSellingCost();
 
             // accumulate products
@@ -286,7 +310,8 @@ public class ReportActivity extends AppCompatActivity {
             tvTotalInvoicesValue.setText(String.valueOf(invoices.size()));
             tvRevenueValue.setText("₹" + String.format(Locale.getDefault(), "%.2f", totalRevenue));
             tvPaymentSplit.setText("UPI: " + upiCount + "  Cash: " + cashCount);
-
+            tvUpiValue.setText("₹" + String.format(Locale.getDefault(), "%.2f", upiValue));
+            tvCashValue.setText("₹" + String.format(Locale.getDefault(), "%.2f", cashValue));
             renderTokensBarChart();
             renderTopProductsChartAndList();
         });
@@ -413,5 +438,37 @@ public class ReportActivity extends AppCompatActivity {
                 t2 = itemView.findViewById(android.R.id.text2);
             }
         }
+    }
+
+    private void downloadReportList() {
+        try {
+            if (invoices.isEmpty()) {
+                Toast.makeText(this, "No Invoices Found", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            saveExcelFile(invoices);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Report Generation failed ..!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void saveExcelFile(List<InvoiceModel> invoiceModelList) throws Exception {
+        String fileName = "invoice-Report-" + System.currentTimeMillis() + ".xlsx";
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
+        ReportGenerator reportGenerator = new ReportGenerator();
+        reportGenerator.createInvoiceExcelReport(invoiceModelList, file);
+
+        // Notify the user
+        Toast.makeText(this, "Report Generated: " + fileName, Toast.LENGTH_SHORT).show();
+
+        // Use FileProvider to get the URI
+        Uri fileUri = FileProvider.getUriForFile(this, AppConstants.COM_APP_BILLING_INSTABILLZ_FILEPROVIDER, file);
+
+        // Open the file using a file explorer
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(fileUri, "application/vnd.ms-excel");
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(intent);
     }
 }
