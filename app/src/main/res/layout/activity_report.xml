@@ -255,7 +255,7 @@
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/hbarTopProducts"
                 android:layout_width="match_parent"
-                android:layout_height="400dp" />
+                android:layout_height="220dp" />
 
 
             <!-- Product list summary (recycler) -->

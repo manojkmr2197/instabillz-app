@@ -290,10 +290,12 @@ public class ReportActivity extends AppCompatActivity {
 
             if ("UPI".equalsIgnoreCase(inv.getPaymentMode())) {
                 upiCount++;
-                upiValue = upiValue+inv.getSellingCost();
+                if (inv.getSellingCost() != null)
+                    upiValue = upiValue+inv.getSellingCost();
             } else {
                 cashCount++;
-                cashValue = cashValue+inv.getSellingCost();
+                if (inv.getSellingCost() != null)
+                    cashValue = cashValue+inv.getSellingCost();
             }
             if (inv.getSellingCost() != null) totalRevenue += inv.getSellingCost();
 
@@ -311,7 +313,7 @@ public class ReportActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             tvTotalInvoicesValue.setText(String.valueOf(invoices.size()));
             tvRevenueValue.setText("₹" + String.format(Locale.getDefault(), "%.2f", totalRevenue));
-            tvPaymentSplit.setText("UPI: " + upiCount + "  Cash: " + cashCount);
+            tvPaymentSplit.setText("UPI: " + upiCount + " \nCash: " + cashCount);
             tvUpiValue.setText("₹" + String.format(Locale.getDefault(), "%.2f", upiValue));
             tvCashValue.setText("₹" + String.format(Locale.getDefault(), "%.2f", cashValue));
             renderTokensBarChart();

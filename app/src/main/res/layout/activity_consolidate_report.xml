@@ -1,10 +1,219 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.ConsolidateReportActivity">
+    android:background="#F6F8FB"
+    android:scrollbars="none"
+    android:fadingEdge="none">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- 🔹 Title Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/consolidate_report_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_baseline_arrow_back_24" />
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/baseline_analytics_24"
+                app:tint="@color/app_color" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Consolidated Report"
+                android:textColor="@color/app_color"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- 🔹 Filter -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/edittext_background"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:layout_margin="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Select Range:"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <Spinner
+                android:id="@+id/spinnerDateRange"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_bg"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="6dp"
+                android:textAlignment="center" />
+        </LinearLayout>
+
+        <!-- 🔹 KPI Dashboard Cards -->
+        <GridLayout
+            android:id="@+id/dashboardGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alignmentMode="alignBounds"
+            android:columnCount="2"
+            android:gravity="center"
+            android:padding="12dp"
+            android:rowCount="3"
+            android:useDefaultMargins="true">
+
+            <!-- ✅ Products -->
+            <include
+                android:id="@+id/cardProducts"
+                layout="@layout/item_dashboard_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                android:tag="Products" />
+
+            <!-- ✅ Stocks -->
+            <include
+                android:id="@+id/cardStock"
+                layout="@layout/item_dashboard_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                android:tag="Stocks" />
+
+            <!-- ✅ Expense -->
+            <include
+                android:id="@+id/cardExpense"
+                layout="@layout/item_dashboard_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                android:tag="Expense" />
+
+            <!-- ✅ Attendance -->
+            <include
+                android:id="@+id/cardAttendance"
+                layout="@layout/item_dashboard_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                android:tag="Attendance" />
+
+            <!-- ✅ Invoice -->
+            <include
+                android:id="@+id/cardInvoice"
+                layout="@layout/item_dashboard_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                android:tag="Invoices" />
+
+            <!-- ✅ Sales -->
+            <include
+                android:id="@+id/cardSales"
+                layout="@layout/item_dashboard_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                android:tag="Sales" />
+
+        </GridLayout>
+
+
+        <!-- 🔹 Pie Chart -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@color/white"
+            app:cardCornerRadius="14dp"
+            android:padding="8dp"
+            android:layout_margin="8dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Payment Split (Cash vs UPI)"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/paymentTotalsRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp">
+
+                    <TextView
+                        android:id="@+id/tvUpiAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="UPI: ₹0"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/teal_700"
+                        android:layout_marginEnd="16dp" />
+
+                    <TextView
+                        android:id="@+id/tvCashAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cash: ₹0"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/teal_700"
+                        android:layout_marginEnd="16dp" />
+
+                </LinearLayout>
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/piePaymentMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_margin="5dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</ScrollView>

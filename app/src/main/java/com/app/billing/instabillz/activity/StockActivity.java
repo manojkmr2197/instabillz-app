@@ -176,7 +176,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
         input.setLayoutParams(etParams);
         input.setGravity(Gravity.CENTER);
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setText(stockModel.getQuantity()); // default value
+        input.setText(""+stockModel.getQuantity()); // default value
         input.setSelectAllOnFocus(true);
 
         // 🔹 Plus Button
@@ -210,7 +210,15 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
             String qtyStr = input.getText().toString().trim();
             if (!qtyStr.isEmpty()) {
                 int qty = Integer.parseInt(qtyStr);
-                stockModel.setQuantity(qty);
+                if(action.equalsIgnoreCase("LOAD")) {
+                    stockModel.setQuantity(stockModel.getQuantity() + qty);
+                }else if(action.equalsIgnoreCase("UNLOAD")) {
+                    if(stockModel.getQuantity() < qty){
+                        Toast.makeText(context, "Stock Quantity is not sufficient", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    stockModel.setQuantity(stockModel.getQuantity() - qty);
+                }
                 InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.STOCKS_COLLECTION, stockModel.getId(), stockModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
                     public void onSuccess(Object orderId) {

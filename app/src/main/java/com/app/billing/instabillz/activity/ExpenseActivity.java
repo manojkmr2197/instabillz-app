@@ -290,7 +290,7 @@ public class ExpenseActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                     // 🔹 Update RecyclerView or show message
                     if (expenseModelList.isEmpty()) {
-                        Toast.makeText(this, "No attendance records found.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "No Expense records found.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -327,7 +327,7 @@ public class ExpenseActivity extends AppCompatActivity {
         EditText descET = dialog.findViewById(R.id.expense_create_desc);
         EditText amountET = dialog.findViewById(R.id.expense_create_price);
         Button submitBtn = dialog.findViewById(R.id.expense_create_submit);
-        ImageView closeBtn = dialog.findViewById(R.id.expense_create_close);
+        TextView closeBtn = dialog.findViewById(R.id.expense_create_close);
 
         // 1️⃣ Setup Spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
@@ -352,6 +352,7 @@ public class ExpenseActivity extends AppCompatActivity {
                         selectedDate[0] = sdf.format(calendar.getTime());
                         selectDateTV.setText(selectedDate[0]);
                     }, year, month, day);
+            datePicker.getDatePicker().setMaxDate(System.currentTimeMillis());
             datePicker.show();
         });
 
