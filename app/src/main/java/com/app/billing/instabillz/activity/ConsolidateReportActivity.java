@@ -1,8 +1,12 @@
 package com.app.billing.instabillz.activity;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -11,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,15 +25,27 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.app.billing.instabillz.R;
+import com.app.billing.instabillz.constants.AppConstants;
+import com.app.billing.instabillz.utils.SingleTon;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ConsolidateReportActivity extends AppCompatActivity {
@@ -38,9 +55,25 @@ public class ConsolidateReportActivity extends AppCompatActivity {
 
     private Map<String, View> cardViews = new HashMap<>();
 
-    private List<String> dateOptions = Arrays.asList("Today", "Yesterday", "Last 7 Days", "This Month");
-
     TextView back;
+    private AlertDialog loaderDialog;
+
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+    Context context;
+    Activity activity;
+
+    final long[] productCount = {0};
+    final long[] stockCount = {0};
+    final long[] nearZeroStockCount = {0};
+    final double[] totalExpense = {0};
+    final long[] attendanceCount = {0};
+    final long[] invoiceCount = {0};
+    final double[] totalSales = {0};
+    final double[] totalUpi = {0};
+    final double[] totalCash = {0};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +89,9 @@ public class ConsolidateReportActivity extends AppCompatActivity {
             window.setStatusBarColor(getResources().getColor(android.R.color.transparent, getTheme()));
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
+
+        context = ConsolidateReportActivity.this;
+        activity = ConsolidateReportActivity.this;
 
         back = findViewById(R.id.consolidate_report_back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -78,40 +114,130 @@ public class ConsolidateReportActivity extends AppCompatActivity {
         cardViews.put("Invoices", findViewById(R.id.cardInvoice));
         cardViews.put("Sales", findViewById(R.id.cardSales));
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, dateOptions);
+        ArrayAdapter<CharSequence> adapter =
+                ArrayAdapter.createFromResource(
+                        this,
+                        R.array.expense_range,
+                        android.R.layout.simple_spinner_item
+                );
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDateRange.setAdapter(adapter);
 
         spinnerDateRange.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 animateDashboard();
-                loadDashboard(dateOptions.get(position));
+                loadDashboard(spinnerDateRange.getSelectedItem().toString());
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
 
-        loadDashboard("Today");
+        //loadDashboard("Today");
     }
 
     private void loadDashboard(String range) {
-        // Mock values (replace with Firebase queries)
-        setCardData("Products", "120");
-        setCardData("Stocks", "480");
-        setCardData("Expense", "₹2345");
-        setCardData("Attendance", "12");
-        setCardData("Invoices", "15");
-        setCardData("Sales", "₹20,500");
 
-        Double cashValue =12000d;
-        Double upiValue = 8500d;
+        // Define variables to hold results
 
-        tvUpiAmount.setText("UPI: ₹" + String.format("%.2f", upiValue));
-        tvCashAmount.setText("Cash: ₹" + String.format("%.2f", cashValue));
+        Pair<Date, Date> date_range = SingleTon.getStartAndEndDate(range);
+        Date startDate = date_range.first;
+        Date endDate = date_range.second;
 
-        loadPieChart(12000, 8500);
+        Pair<Long, Long> long_range_pair = SingleTon.getEpochStartAndEnd(range);
+        long startEpoch = long_range_pair.first;
+        long endEpoch = long_range_pair.second;
+
+// 1️⃣ Products count
+        Task<AggregateQuerySnapshot> productsTask =
+                db.collection(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION)
+                        .count().get(AggregateSource.SERVER)
+                        .addOnSuccessListener(snap -> productCount[0] = snap.getCount());
+
+// 2️⃣ Stocks count + nearly zero count
+        Task<QuerySnapshot> stocksTask =
+                db.collection(AppConstants.APP_NAME + AppConstants.STOCKS_COLLECTION).get()
+                        .addOnSuccessListener(snap -> {
+                            stockCount[0] = snap.size();
+                            nearZeroStockCount[0] = snap.getDocuments().stream()
+                                    .filter(d -> d.getDouble("quantity") != null && d.getDouble("quantity") <= 3)
+                                    .count();
+                        });
+
+// 3️⃣ Expense total in date range
+        Task<QuerySnapshot> expenseTask =
+                db.collection(AppConstants.APP_NAME + AppConstants.EXPENSE_COLLECTION)
+                        .whereGreaterThanOrEqualTo("date", sdf.format(startDate))
+                        .whereLessThanOrEqualTo("date", sdf.format(endDate))
+                        .get()
+                        .addOnSuccessListener(snap -> {
+                            double total = 0;
+                            for (DocumentSnapshot doc : snap) {
+                                Double amount = doc.getDouble("amount");
+                                if (amount != null) total += amount;
+                            }
+                            totalExpense[0] = total;
+                        });
+
+// 4️⃣ Attendance count
+        Task<AggregateQuerySnapshot> attendanceTask =
+                db.collection(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION)
+                        .whereGreaterThanOrEqualTo("date", sdf.format(startDate))
+                        .whereLessThanOrEqualTo("date", sdf.format(endDate))
+                        .count()
+                        .get(AggregateSource.SERVER)
+                        .addOnSuccessListener(snap -> attendanceCount[0] = snap.getCount());
+
+// 5️⃣ Invoice count + total sales + UPI vs CASH
+        Task<QuerySnapshot> invoiceTask =
+                db.collection(AppConstants.APP_NAME + AppConstants.SALES_COLLECTION)
+                        .whereGreaterThanOrEqualTo("billingDate", startEpoch)
+                        .whereLessThanOrEqualTo("billingDate", endEpoch)
+                        .get()
+                        .addOnSuccessListener(snap -> {
+                            invoiceCount[0] = snap.size();
+                            double sales = 0, upi = 0, cash = 0;
+                            for (DocumentSnapshot doc : snap) {
+                                Double total = doc.getDouble("sellingCost");
+                                String mode = doc.getString("paymentMode");
+                                if (total != null) {
+                                    sales += total;
+                                    if ("UPI".equalsIgnoreCase(mode)) upi += total;
+                                    else if ("CASH".equalsIgnoreCase(mode)) cash += total;
+                                }
+                            }
+                            totalSales[0] = sales;
+                            totalUpi[0] = upi;
+                            totalCash[0] = cash;
+                        });
+        showLoader();
+// ✅ Wait for all to finish
+        Tasks.whenAllComplete(productsTask, stocksTask, expenseTask, attendanceTask, invoiceTask)
+                .addOnCompleteListener(done -> {
+                    // Update your dashboard UI
+                    hideLoader();
+                    setCardData("Products", String.valueOf(productCount[0]));
+                    setCardData("Stocks", String.valueOf(stockCount[0]));
+                    setCardData("Expense", "₹ " + totalExpense[0]);
+                    setCardData("Attendance", String.valueOf(attendanceCount[0]));
+                    setCardData("Invoices", String.valueOf(invoiceCount[0]));
+                    setCardData("Sales", "₹ " + totalSales[0]);
+
+                    Double cashValue = totalCash[0];
+                    Double upiValue = totalUpi[0];
+
+                    tvUpiAmount.setText("UPI: ₹" + String.format("%.2f", upiValue));
+                    tvCashAmount.setText("Cash: ₹" + String.format("%.2f", cashValue));
+
+                    loadPieChart(cashValue, upiValue);
+
+                });
+
     }
+
 
     private void setCardData(String key, String value) {
         View card = cardViews.get(key);
@@ -161,6 +287,20 @@ public class ConsolidateReportActivity extends AppCompatActivity {
             card.setScaleX(0.8f);
             card.setScaleY(0.8f);
             card.animate().scaleX(1f).scaleY(1f).setDuration(400).start();
+        }
+    }
+
+    private void showLoader() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setView(R.layout.loader_layout); // Your custom loader layout with ProgressBar
+        loaderDialog = builder.create();
+        loaderDialog.show();
+    }
+
+    private void hideLoader() {
+        if (loaderDialog != null && loaderDialog.isShowing()) {
+            loaderDialog.dismiss();
         }
     }
 }

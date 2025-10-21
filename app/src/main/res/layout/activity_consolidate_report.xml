@@ -63,11 +63,11 @@
 
             <Spinner
                 android:id="@+id/spinnerDateRange"
-                android:layout_width="200dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@drawable/spinner_bg"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="6dp"
+                android:padding="5dp"
                 android:textAlignment="center" />
         </LinearLayout>
 
