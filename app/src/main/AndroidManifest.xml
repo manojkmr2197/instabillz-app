@@ -34,6 +34,9 @@
         android:theme="@style/Theme.InstaBillz"
         tools:targetApi="31">
         <activity
+            android:name=".activity.OnboardingActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.VendorActivity"
             android:exported="false" />
         <activity
