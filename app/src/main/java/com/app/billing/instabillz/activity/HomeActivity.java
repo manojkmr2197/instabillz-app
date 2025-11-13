@@ -28,6 +28,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -48,6 +49,7 @@ import com.app.billing.instabillz.adapter.BillingViewAdapter;
 import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.listener.BillingClickListener;
 import com.app.billing.instabillz.model.AttendanceModel;
+import com.app.billing.instabillz.model.CategoryModel;
 import com.app.billing.instabillz.model.EmployeeModel;
 import com.app.billing.instabillz.model.InvoiceModel;
 import com.app.billing.instabillz.model.PrinterDataModel;
@@ -60,6 +62,8 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -76,12 +80,17 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     NavigationView navigationView;
     BillingClickListener listener;
 
+    LinearLayout layoutCategories;
+
     EditText productSearch;
     List<ProductModel> filteredList;
     List<ProductModel> products;
     BillingViewAdapter adapter;
 
     Button submit, preview;
+
+    String selectedCategory = "", searchString = "";
+    List<String> categoryModelList = new ArrayList<>();
 
     SharedPrefHelper sharedPrefHelper;
 
@@ -208,9 +217,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         products = new ArrayList<>();
         filteredList = new ArrayList<>();
         loadProductList();
+        loadCategoryList();
         adapter = new BillingViewAdapter(context, filteredList, listener);
         recyclerView.setAdapter(adapter);
 
+        layoutCategories = findViewById(R.id.home_layout_categories);
         productSearch = (EditText) findViewById(R.id.home_etSearch);
         submit = (Button) findViewById(R.id.home_submit_invoice);
         preview = (Button) findViewById(R.id.home_preview);
@@ -228,7 +239,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void afterTextChanged(Editable s) {
-                homePageFilter(s.toString());
+                searchString = s.toString();
+                homePageFilter(searchString);
             }
         });
         enableBluetooth();
@@ -300,6 +312,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }
+        if (StringUtils.isNotBlank(selectedCategory) && !selectedCategory.equalsIgnoreCase("All")) {
+            for (int i = filteredList.size() - 1; i >= 0; i--) {
+                if (!selectedCategory.equalsIgnoreCase(filteredList.get(i).getCategoryName())) {
+                    filteredList.remove(i);
+                }
+            }
+        }
+
         adapter.notifyDataSetChanged();
 
     }
@@ -310,6 +330,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         mDrawerLayout.closeDrawer(GravityCompat.START);
         if (item.getItemId() == R.id.nav_products) {
             i = new Intent(HomeActivity.this, ProductActivity.class);
+            startActivity(i);
+        } else if (item.getItemId() == R.id.nav_category) {
+            i = new Intent(HomeActivity.this, CategoryActivity.class);
             startActivity(i);
         } else if (item.getItemId() == R.id.nav_stocks) {
             i = new Intent(HomeActivity.this, StockActivity.class);
@@ -716,5 +739,70 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
+    private void loadCategoryList() {
 
+        Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
+        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.CATEGORIES_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @Override
+            public void onSuccess(Object data) {
+                categoryModelList.clear();
+                categoryModelList.add("All");
+                QuerySnapshot documentSnapshotList = (QuerySnapshot) data;
+                for (DocumentSnapshot doc : documentSnapshotList) {
+                    categoryModelList.add(doc.toObject(CategoryModel.class).getName());
+                }
+                // Inflate category chips
+                for (String category : categoryModelList) {
+                    TextView tv = new TextView(context);
+                    tv.setText(category);
+                    tv.setTextSize(14);
+                    tv.setPadding(24, 12, 24, 12);
+                    tv.setBackground(ContextCompat.getDrawable(context, R.drawable.category_chip_bg));
+                    tv.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                    params.setMargins(10, 8, 10, 8);
+                    tv.setLayoutParams(params);
+
+                    // Optional: handle click
+                    tv.setOnClickListener(v -> {
+                        // You can handle category click here (e.g. filter product list)
+                        // Example: highlight the selected one
+                        highlightSelectedCategory(tv);
+                        selectedCategory = tv.getText().toString();
+                        homePageFilter(searchString);
+                    });
+
+                    layoutCategories.addView(tv);
+                    if (category.equalsIgnoreCase("All")) {
+                        highlightSelectedCategory(tv);
+                        selectedCategory = tv.getText().toString();
+                        homePageFilter(searchString);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+    private void highlightSelectedCategory(TextView selectedView) {
+        // Reset all first
+        for (int i = 0; i < layoutCategories.getChildCount(); i++) {
+            TextView tv = (TextView) layoutCategories.getChildAt(i);
+            tv.setBackground(ContextCompat.getDrawable(this, R.drawable.category_chip_bg));
+            tv.setTextColor(ContextCompat.getColor(this, android.R.color.black));
+        }
+        // Highlight selected
+        selectedView.setBackground(ContextCompat.getDrawable(this, R.drawable.category_chip_selected_bg));
+        selectedView.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+    }
 }

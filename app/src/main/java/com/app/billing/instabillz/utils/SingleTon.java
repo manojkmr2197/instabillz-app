@@ -81,6 +81,10 @@ public class SingleTon {
         return "PRODUCT-"+ UUID.randomUUID().toString();
     }
 
+    public static final String generateCategoryDocument(){
+        return "CATEGORY-"+ UUID.randomUUID().toString();
+    }
+
     public static final String generateStockDocument(){
         return "STOCK-"+ UUID.randomUUID().toString();
     }

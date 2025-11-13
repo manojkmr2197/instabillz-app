@@ -8,6 +8,7 @@ public class AppConstants {
     //DB constants
     public static final String APP_NAME = "namma-tea-kadai";
     public static final String PRODUCTS_COLLECTION = "_products";
+    public static final String CATEGORIES_COLLECTION = "_categories";
     public static final String STOCKS_COLLECTION = "_stocks";
     public static final String ATTENDANCE_COLLECTION = "_attendance";
     public static final String EMPLOYEE_COLLECTION = "_employee";

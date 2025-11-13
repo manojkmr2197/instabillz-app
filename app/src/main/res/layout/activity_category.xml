@@ -14,7 +14,7 @@
         android:layout_marginStart="10dp">
 
         <TextView
-            android:id="@+id/product_back"
+            android:id="@+id/category_back"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
@@ -25,6 +25,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
+            android:layout_marginEnd="50dp"
             android:orientation="vertical">
 
             <TextView
@@ -42,13 +43,6 @@
                 android:textSize="10sp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/product_download"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="5dp"
-            android:background="@drawable/baseline_arrow_circle_down_24" />
 
 
     </LinearLayout>
@@ -61,37 +55,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
-            <EditText
-                android:id="@+id/product_etSearch"
+            <TextView
+                android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5sp"
-                android:background="@drawable/search_bg"
-                android:completionThreshold="1"
-                android:dropDownHeight="200dp"
-                android:hint="Search product"
-                android:padding="12dp"
-                android:singleLine="true"
-                android:textSize="16sp" />
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="Categories"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
-            <!-- ✅ Add this block below EditText -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/layoutCategories"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="6dp" />
-            </HorizontalScrollView>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/product_recyclerView"
+                android:id="@+id/category_recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_margin="5dp"
@@ -101,7 +78,7 @@
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/product_add_fab"
+            android:id="@+id/category_add_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"

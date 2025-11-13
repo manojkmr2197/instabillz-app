@@ -16,63 +16,31 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="5dp"
-            android:text="Add Product"
+            android:text="Add Category"
             android:textColor="@color/white"
             android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/product_create_close"
+            android:id="@+id/category_create_close"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@drawable/ic_baseline_close_24" />
     </LinearLayout>
 
     <EditText
-        android:id="@+id/product_create_name"
+        android:id="@+id/category_create_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5sp"
         android:background="@drawable/search_bg"
         android:completionThreshold="1"
         android:dropDownHeight="200dp"
-        android:hint="Enter Product Name"
+        android:hint="Enter Category Name"
         android:padding="12dp"
         android:textAllCaps="true"
         android:inputType="textCapCharacters"
         android:singleLine="true"
         android:textSize="16sp" />
-
-    <EditText
-        android:id="@+id/product_create_price"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5sp"
-        android:background="@drawable/search_bg"
-        android:completionThreshold="1"
-        android:dropDownHeight="200dp"
-        android:hint="Enter Product Price"
-        android:padding="12dp"
-        android:inputType="number"
-        android:singleLine="true"
-        android:textSize="16sp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:padding="5dp"
-        android:text="Category"
-        android:textColor="@color/black"
-        android:textSize="15sp"
-        android:textStyle="bold" />
-    <Spinner
-        android:id="@+id/product_create_category_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:layout_margin="5dp"
-        android:padding="5dp"
-        android:background="@drawable/spinner_bg" />
 
 
     <LinearLayout
@@ -86,7 +54,7 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/product_create_submit"
+            android:id="@+id/category_create_submit"
             android:layout_width="200sp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -99,11 +67,6 @@
             android:layout_height="1dp"
             android:layout_weight="1" />
 
-        <TextView
-            android:id="@+id/product_create_delete"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/baseline_delete_24" />
     </LinearLayout>
 
 </LinearLayout>

@@ -89,6 +89,21 @@
                 android:dropDownHeight="200dp"
                 android:completionThreshold="1"/>
 
+            <!-- ✅ Add this block below EditText -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/home_layout_categories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="6dp" />
+            </HorizontalScrollView>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/home_recyclerView"
                 android:layout_width="match_parent"

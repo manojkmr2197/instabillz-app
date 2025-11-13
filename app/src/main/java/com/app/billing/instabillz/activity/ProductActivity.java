@@ -18,13 +18,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,6 +37,7 @@ import com.app.billing.instabillz.R;
 import com.app.billing.instabillz.adapter.ProductViewAdapter;
 import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.listener.BillingClickListener;
+import com.app.billing.instabillz.model.CategoryModel;
 import com.app.billing.instabillz.model.ProductModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.ReportGenerator;
@@ -43,8 +48,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ProductActivity extends AppCompatActivity implements View.OnClickListener {
@@ -56,11 +64,15 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
     Context context;
     Activity activity;
 
+    LinearLayout layoutCategories;
     EditText productSearch;
     List<ProductModel> filteredList;
     List<ProductModel> products;
     ProductViewAdapter adapter;
     BillingClickListener listener;
+
+    String selectedCategory = "", searchString = "";
+    List<String> categoryModelList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +93,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
         activity = ProductActivity.this;
 
         productSearch = (EditText) findViewById(R.id.product_etSearch);
+        layoutCategories = findViewById(R.id.layoutCategories);
         recyclerView = (RecyclerView) findViewById(R.id.product_recyclerView);
         back = (TextView) findViewById(R.id.product_back);
         back.setOnClickListener(this);
@@ -91,7 +104,6 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
         add_fab = (FloatingActionButton) findViewById(R.id.product_add_fab);
         add_fab.setOnClickListener(this);
 
-        RecyclerView recyclerView = findViewById(R.id.product_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         listener = new BillingClickListener() {
@@ -123,19 +135,19 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
 
             @Override
             public void afterTextChanged(Editable s) {
-                productPageFilter(s.toString());
+                searchString = s.toString();
+                productPageFilter(searchString);
             }
         });
-
         loadProductList();
-
+        loadCategoryList();
     }
 
     private void productDeleteConfirmationPopUp(ProductModel productModel) {
         // Create and configure the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Confirmation");
-        builder.setMessage("Do you want to Delete the Product ["+productModel.getName()+"]");
+        builder.setMessage("Do you want to Delete the Product [" + productModel.getName() + "]");
         builder.setCancelable(true);
 
         // Set positive button
@@ -172,6 +184,15 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         }
+
+        if (StringUtils.isNotBlank(selectedCategory) && !selectedCategory.equalsIgnoreCase("All")) {
+            for (int i = filteredList.size() - 1; i >= 0; i--) {
+                if (!selectedCategory.equalsIgnoreCase(filteredList.get(i).getCategoryName())) {
+                    filteredList.remove(i);
+                }
+            }
+        }
+
         adapter.notifyDataSetChanged();
 
     }
@@ -188,6 +209,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
         }
 
     }
+
     private void downloadProductList() {
         try {
             saveExcelFile(products);
@@ -246,10 +268,15 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
         TextView delete = sheetView.findViewById(R.id.product_create_delete);
         TextView close = sheetView.findViewById(R.id.product_create_close);
 
+        Spinner categorySpinner = sheetView.findViewById(R.id.product_create_category_spinner);
+        ArrayAdapter<String> arrayadapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, categoryModelList.subList(1, categoryModelList.size()));
+        categorySpinner.setAdapter(arrayadapter);
+        categorySpinner.setSelection(0);
+
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SingleTon.hideKeyboard(context,activity);
+                SingleTon.hideKeyboard(context, activity);
                 dialog.dismiss();
             }
         });
@@ -265,6 +292,10 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
                     dialog.dismiss();
                 }
             });
+
+            if(StringUtils.isNotBlank(productModel.getCategoryName())){
+                categorySpinner.setSelection(arrayadapter.getPosition(productModel.getCategoryName()));
+            }
         } else {
             delete.setVisibility(View.GONE);
         }
@@ -276,6 +307,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
             }
             newProductModel.setName(productName.getText().toString().toUpperCase());
             newProductModel.setPrice(Double.parseDouble(productPrice.getText().toString()));
+            newProductModel.setCategoryName(categorySpinner.getSelectedItem().toString());
 
             InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, newProductModel.getId(), newProductModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                 @Override
@@ -298,7 +330,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private void deleteProductItem(String id){
+    private void deleteProductItem(String id) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
         InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, id, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
@@ -339,4 +371,73 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
         });
 
     }
+
+    private void loadCategoryList() {
+
+        Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
+        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.CATEGORIES_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @Override
+            public void onSuccess(Object data) {
+                categoryModelList.clear();
+                categoryModelList.add("All");
+                QuerySnapshot documentSnapshotList = (QuerySnapshot) data;
+                for (DocumentSnapshot doc : documentSnapshotList) {
+                    categoryModelList.add(doc.toObject(CategoryModel.class).getName());
+                }
+                // Inflate category chips
+                for (String category : categoryModelList) {
+                    TextView tv = new TextView(context);
+                    tv.setText(category);
+                    tv.setTextSize(16);
+                    tv.setPadding(24, 12, 24, 12);
+                    tv.setBackground(ContextCompat.getDrawable(context, R.drawable.category_chip_bg));
+                    tv.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                    params.setMargins(10, 8, 10, 8);
+                    tv.setLayoutParams(params);
+
+                    // Optional: handle click
+                    tv.setOnClickListener(v -> {
+                        // You can handle category click here (e.g. filter product list)
+                        // Example: highlight the selected one
+                        highlightSelectedCategory(tv);
+                        selectedCategory = tv.getText().toString();
+                        productPageFilter(searchString);
+                    });
+
+                    layoutCategories.addView(tv);
+                    if (category.equalsIgnoreCase("All")) {
+                        highlightSelectedCategory(tv);
+                        selectedCategory = tv.getText().toString();
+                        productPageFilter(searchString);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private void highlightSelectedCategory(TextView selectedView) {
+        // Reset all first
+        for (int i = 0; i < layoutCategories.getChildCount(); i++) {
+            TextView tv = (TextView) layoutCategories.getChildAt(i);
+            tv.setBackground(ContextCompat.getDrawable(this, R.drawable.category_chip_bg));
+            tv.setTextColor(ContextCompat.getColor(this, android.R.color.black));
+        }
+        // Highlight selected
+        selectedView.setBackground(ContextCompat.getDrawable(this, R.drawable.category_chip_selected_bg));
+        selectedView.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+    }
+
 }

@@ -5,17 +5,22 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_category"
+            android:icon="@drawable/baseline_category_24"
+            android:title="Category" />
+        <item
             android:id="@+id/nav_products"
             android:icon="@drawable/products"
             android:title="Products" />
         <item
-            android:id="@+id/nav_stocks"
-            android:icon="@drawable/accessory"
-            android:title="Stocks" />
-        <item
             android:id="@+id/nav_vendors"
             android:icon="@drawable/baseline_co_present_24"
             android:title="Vendors" />
+        <item
+            android:id="@+id/nav_stocks"
+            android:icon="@drawable/accessory"
+            android:title="Stocks" />
+
         <item
             android:id="@+id/nav_expense"
             android:icon="@drawable/baseline_construction_24"
