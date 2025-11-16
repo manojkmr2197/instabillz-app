@@ -3,7 +3,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="app_color">#205C9B</color>
+    <color name="app_color_light">#4FA6E2</color>
     <color name="splash_fade_color">#FAFAFA</color>
     <color name="teal_700">#00796B</color>
+    <color name="status_bar_color">#DDE3FA</color>
 
 </resources>

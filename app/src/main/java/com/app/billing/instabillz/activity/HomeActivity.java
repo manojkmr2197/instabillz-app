@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -116,7 +117,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             Window window = this.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(getResources().getColor(android.R.color.transparent, getTheme()));
+            window.setStatusBarColor(getResources().getColor(R.color.status_bar_color, getTheme()));
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
         context = HomeActivity.this;
@@ -129,6 +130,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        Menu menu = navigationView.getMenu();
+        MenuItem adminGroup = menu.findItem(R.id.admin_group);
+        String loginPhone = sharedPrefHelper.getSystemUserPhone();
+        if (loginPhone.equals("9585905176")) {
+            adminGroup.setVisible(true);   // show admin menu
+        } else {
+            adminGroup.setVisible(false);  // hide admin menu
+        }
+
+
         TextView textView = (TextView) findViewById(R.id.home_nav_text_view);
         TextView attendance = (TextView) findViewById(R.id.home_attendance_tv);
         TextView todayInvoice = (TextView) findViewById(R.id.home_today_invoice_tv);
@@ -361,6 +372,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         } else if (item.getItemId() == R.id.nav_consolidate_report) {
             i = new Intent(HomeActivity.this, ConsolidateReportActivity.class);
             startActivity(i);
+        } else if (item.getItemId() == R.id.nav_onboarding) {
+            i = new Intent(HomeActivity.this, OnboardingActivity.class);
+            startActivity(i);
         }
         return true;
     }
@@ -458,9 +472,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (s.toString().isEmpty()) {
-                        return;
+                        parcelAmountValue[0] = 0.0;
+                    } else {
+                        parcelAmountValue[0] = Double.parseDouble(s.toString());
                     }
-                    parcelAmountValue[0] = Double.parseDouble(s.toString());
                     cartTotal.setText("Total: ₹" + (total[0] + parcelAmountValue[0]));
                 }
             });
@@ -621,7 +636,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             Toast.makeText(context, "Printing.!", Toast.LENGTH_LONG).show();
             try {
-                bluetoothPrinterHelper.printSmallFontReceipt(billData,printerDataModel);
+                bluetoothPrinterHelper.printSmallFontReceipt(billData, printerDataModel);
                 loadProductList();
 
             } catch (Exception e) {
@@ -739,6 +754,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
+
     private void loadCategoryList() {
 
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
@@ -794,6 +810,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         });
 
     }
+
     private void highlightSelectedCategory(TextView selectedView) {
         // Reset all first
         for (int i = 0; i < layoutCategories.getChildCount(); i++) {

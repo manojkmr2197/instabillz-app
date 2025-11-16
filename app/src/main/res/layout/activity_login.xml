@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@drawable/page_bg"
     tools:context=".activity.LoginActivity">
 
     <!-- Top Right "Login with Different User" -->
@@ -23,95 +24,105 @@
         android:textSize="14sp" />
 
     <!-- Center Content -->
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_margin="10dp"
+        app:cardCornerRadius="15dp"
+        android:layout_centerInParent="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:gravity="center">
-            <!-- App Logo -->
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/app_image" />
-            <!-- App Logo -->
-            <ImageView
-                android:layout_width="50dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:gravity="center">
+                <!-- App Logo -->
+                <ImageView
+                    android:id="@+id/login_app_logo"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/app_image" />
+                <!-- App Logo -->
+                <ImageView
+                    android:id="@+id/login_partnership"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="10sp"
+                    android:src="@drawable/partnership" />
+                <!-- App Logo -->
+                <ImageView
+                    android:id="@+id/login_client_logo"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/client_logo" />
+            </LinearLayout>
+
+            <!-- Phone Number -->
+            <EditText
+                android:id="@+id/etPhoneNumber"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_margin="10sp"
-                android:src="@drawable/partnership" />
-            <!-- App Logo -->
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/client_logo" />
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/edittext_background"
+                android:gravity="center"
+                android:hint="Enter phone number"
+                android:inputType="phone"
+                android:maxLength="10"
+                android:padding="10dp"
+                android:textSize="16sp" />
+
+            <!-- 4 Digit Passcode -->
+            <LinearLayout
+                android:id="@+id/passcodeLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etDigit1"
+                    style="@style/PasscodeDigitStyle"
+                    android:cursorVisible="false"
+                    android:inputType="numberPassword" />
+
+                <EditText
+                    android:id="@+id/etDigit2"
+                    style="@style/PasscodeDigitStyle"
+                    android:cursorVisible="false"
+                    android:inputType="numberPassword" />
+
+                <EditText
+                    android:id="@+id/etDigit3"
+                    style="@style/PasscodeDigitStyle"
+                    android:cursorVisible="false"
+                    android:inputType="numberPassword" />
+
+                <EditText
+                    android:id="@+id/etDigit4"
+                    style="@style/PasscodeDigitStyle"
+                    android:cursorVisible="false"
+                    android:inputType="numberPassword" />
+            </LinearLayout>
+
+            <!-- Login Button -->
+            <Button
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="40dp"
+                android:backgroundTint="@color/app_color"
+                android:text="Login"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
         </LinearLayout>
-
-        <!-- Phone Number -->
-        <EditText
-            android:id="@+id/etPhoneNumber"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/edittext_background"
-            android:gravity="center"
-            android:hint="Enter phone number"
-            android:inputType="phone"
-            android:maxLength="10"
-            android:padding="10dp"
-            android:textSize="16sp" />
-
-        <!-- 4 Digit Passcode -->
-        <LinearLayout
-            android:id="@+id/passcodeLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/etDigit1"
-                android:inputType="numberPassword"
-                android:cursorVisible="false"
-                style="@style/PasscodeDigitStyle" />
-
-            <EditText
-                android:id="@+id/etDigit2"
-                android:inputType="numberPassword"
-                android:cursorVisible="false"
-                style="@style/PasscodeDigitStyle" />
-
-            <EditText
-                android:id="@+id/etDigit3"
-                android:inputType="numberPassword"
-                android:cursorVisible="false"
-                style="@style/PasscodeDigitStyle" />
-
-            <EditText
-                android:id="@+id/etDigit4"
-                android:inputType="numberPassword"
-                android:cursorVisible="false"
-                style="@style/PasscodeDigitStyle" />
-        </LinearLayout>
-
-        <!-- Login Button -->
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="40dp"
-            android:backgroundTint="@color/app_color"
-            android:text="Login"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>

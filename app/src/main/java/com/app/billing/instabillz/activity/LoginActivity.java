@@ -15,8 +15,11 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,8 +53,6 @@ public class LoginActivity extends AppCompatActivity {
     Activity activity;
     SharedPrefHelper sharedPrefHelper;
 
-    PrinterDataModel printerDataModel = new PrinterDataModel();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
             Window window = this.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(getResources().getColor(android.R.color.transparent, getTheme()));
+            window.setStatusBarColor(getResources().getColor(R.color.status_bar_color, getTheme()));
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
 
@@ -77,6 +78,16 @@ public class LoginActivity extends AppCompatActivity {
         etDigit4 = findViewById(R.id.etDigit4);
         btnLogin = findViewById(R.id.btnLogin);
         tvDifferentUser = findViewById(R.id.tvDifferentUser);
+
+        ImageView logo1 = findViewById(R.id.login_app_logo);
+        ImageView logo2 = findViewById(R.id.login_partnership);
+        ImageView logo3 = findViewById(R.id.login_client_logo);
+
+        Animation popAnim = AnimationUtils.loadAnimation(this, R.anim.logo_pop);
+
+        logo1.startAnimation(popAnim);
+        logo2.startAnimation(popAnim);
+        logo3.startAnimation(popAnim);
 
         sharedPrefHelper = new SharedPrefHelper(context);
 
@@ -113,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        btnLogin.setOnClickListener(v -> loadPrinterData());
+        btnLogin.setOnClickListener(v -> handleLogin());
         tvDifferentUser.setOnClickListener(v -> clearSharedPref());
 
     }
@@ -153,7 +164,6 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(context, "Login Success.!", Toast.LENGTH_SHORT).show();
                     // Save phone number first time
                     sharedPrefHelper.setSystemUserDetails(model);
-
                     // Go to Home screen
 
                     Intent intent = new Intent(context, HomeActivity.class);
@@ -179,14 +189,10 @@ public class LoginActivity extends AppCompatActivity {
 
     private void clearSharedPref() {
         sharedPrefHelper.clearAllDetails();
-        etPhoneNumber.setText("");
-        etPhoneNumber.setEnabled(true);
-        etDigit1.setText("");
-        etDigit2.setText("");
-        etDigit3.setText("");
-        etDigit4.setText("");
-        etDigit1.requestFocus();
-        Toast.makeText(this, "Cleared user data", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(LoginActivity.this, MerchantActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void enableBackspaceNavigation(EditText... editTexts) {
@@ -238,43 +244,6 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         dialog.show();
-    }
-
-    private void loadPrinterData() {
-        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(AppConstants.SHOP_COLLECTION, AppConstants.APP_NAME, new InstaFirebaseRepository.OnFirebaseWriteListener() {
-            @Override
-            public void onSuccess(Object data) {
-                DocumentSnapshot doc = (DocumentSnapshot) data;
-                if (doc.exists()) {
-                    printerDataModel = doc.toObject(PrinterDataModel.class);
-
-                    if (printerDataModel != null && printerDataModel.getActive()) {
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                        LocalDate subscriptionDate = LocalDate.parse(printerDataModel.getSubscriptionDate(), formatter);
-                        LocalDate today = LocalDate.now();
-
-                        // ✅ Allow only if today is on or before subscription date
-                        if (!today.isAfter(subscriptionDate)) {
-                            // Subscription still valid
-                            sharedPrefHelper.setPrinterDetails(printerDataModel);
-                            handleLogin();
-                        } else {
-                            // Subscription expired
-                            showSubscriptionErrorDialog();
-                        }
-
-                    } else {
-                        showSubscriptionErrorDialog();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                e.printStackTrace();
-                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
 }

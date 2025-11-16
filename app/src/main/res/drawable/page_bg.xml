@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Soft Shadow -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E3E7EF" />
+        </shape>
+    </item>
+
+    <!-- Main Gradient -->
+    <item android:top="0dp" android:left="0dp" android:right="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#FFFFFF"
+                android:centerColor="#EEF2FF"
+                android:endColor="#DDE3FA"
+                android:type="linear" />
+
+            <corners android:radius="0dp" />
+        </shape>
+    </item>
+
+    <!-- Decorative Soft Spotlight -->
+    <item android:top="-150dp" android:left="-80dp">
+        <shape android:shape="oval">
+            <size android:width="300dp" android:height="300dp" />
+            <gradient
+                android:startColor="#33FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="45" />
+        </shape>
+    </item>
+
+</layer-list>

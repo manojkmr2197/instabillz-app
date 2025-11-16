@@ -3,7 +3,7 @@
     android:id="@+id/layoutAttendance"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F9FB"
+    android:background="@drawable/page_bg"
     android:orientation="vertical">
 
     <!-- Heading -->

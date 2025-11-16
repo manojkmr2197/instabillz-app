@@ -3,6 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
+    <item
+        android:id="@+id/admin_group"
+        android:title="Admin">
+        <menu>
+            <item
+                android:id="@+id/nav_onboarding"
+                android:icon="@drawable/baseline_connect_without_contact_24"
+                android:title="New Onboarding" />
+            <item
+                android:id="@+id/nav_shops"
+                android:icon="@drawable/baseline_business_center_24"
+                android:title="Shops" />
+        </menu>
+    </item>
+
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_category"
@@ -61,7 +76,6 @@
                 android:id="@+id/nav_consolidate_report"
                 android:icon="@drawable/baseline_featured_play_list_24"
                 android:title="Consolidate Report" />
-
         </menu>
     </item>
 

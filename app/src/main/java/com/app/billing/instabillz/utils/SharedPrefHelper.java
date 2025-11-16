@@ -36,6 +36,17 @@ public class SharedPrefHelper {
         editor.commit();
     }
 
+    public String getAppName() {
+        return sharedPreferences.getString(SharedConstants.INSTABILLZ_APP_NAME, null);
+    }
+
+    public void setAppName(String appName) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(SharedConstants.INSTABILLZ_APP_NAME, appName);
+        editor.apply();
+        editor.commit();
+    }
+
     public void clearAllDetails() {
         sharedPreferences.edit().clear().apply();
     }

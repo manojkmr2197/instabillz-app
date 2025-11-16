@@ -3,6 +3,7 @@ package com.app.billing.instabillz.constants;
 public class SharedConstants {
 
     public static String INSTABILLZ = "INSTA_BILLZ";
+    public static String INSTABILLZ_APP_NAME = "INSTA_BILLZ_APP_NAME";
 
 
     public static String INSTABILLZ_SYSTEM_PHONE = "INSTA_BILLZ_SYSTEM_PHONE";
