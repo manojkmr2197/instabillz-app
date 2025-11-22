@@ -11,6 +11,8 @@ public class ShopsModel {
     private String shopName;
     private String phoneNumber;
     private String address;
+    private String outletType;
+    private String billingType;
 
     // ---------- LOGO ----------
     private String logo;      // firebase download url
@@ -157,6 +159,22 @@ public class ShopsModel {
 
     public void setOnboardingDate(Date onboardingDate) {
         this.onboardingDate = onboardingDate;
+    }
+
+    public String getOutletType() {
+        return outletType;
+    }
+
+    public void setOutletType(String outletType) {
+        this.outletType = outletType;
+    }
+
+    public String getBillingType() {
+        return billingType;
+    }
+
+    public void setBillingType(String billingType) {
+        this.billingType = billingType;
     }
 }
 

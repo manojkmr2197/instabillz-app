@@ -27,21 +27,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.app.billing.instabillz.R;
-import com.app.billing.instabillz.constants.AppConstants;
-import com.app.billing.instabillz.model.AttendanceModel;
 import com.app.billing.instabillz.model.EmployeeModel;
-import com.app.billing.instabillz.model.PrinterDataModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.MoveNextWatcher;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.apache.commons.lang3.StringUtils;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class LoginActivity extends AppCompatActivity {
 

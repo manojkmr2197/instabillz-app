@@ -38,12 +38,10 @@ import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.listener.BillingClickListener;
 import com.app.billing.instabillz.model.EmployeeModel;
 import com.app.billing.instabillz.model.InvoiceModel;
-import com.app.billing.instabillz.model.PrinterDataModel;
+import com.app.billing.instabillz.model.ShopsModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
-import com.app.billing.instabillz.utils.AutoIndexHelper;
 import com.app.billing.instabillz.utils.BluetoothPrinterHelper;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -94,7 +92,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
     BluetoothAdapter bluetoothAdapter;
     public BluetoothPrinterHelper bluetoothPrinterHelper;
-    PrinterDataModel printerDataModel = new PrinterDataModel();
+    ShopsModel printerDataModel = new ShopsModel();
 
     private static final int REQUEST_WRITE_PERMISSION = 786;
     private static final int REQUEST_ENABLE_BT = 10;

@@ -19,6 +19,7 @@
             android:id="@+id/btnDelete"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_gravity="center"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_baseline_clear_24"
             app:tint="@color/app_color" />
@@ -70,6 +71,7 @@
             android:id="@+id/btnEdit"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_gravity="center"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_baseline_edit_24"
             app:tint="@color/app_color" />

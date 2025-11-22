@@ -13,6 +13,8 @@ import com.app.billing.instabillz.listener.BillingClickListener;
 import com.app.billing.instabillz.model.VendorModel;
 import com.app.billing.instabillz.viewholder.VendorViewHolder;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 public class VendorViewAdapter extends RecyclerView.Adapter<VendorViewHolder>{
@@ -40,7 +42,10 @@ public class VendorViewAdapter extends RecyclerView.Adapter<VendorViewHolder>{
 
         holder.tvVendorName.setText(vendor.getName());
         holder.tvVendorPhone.setText(vendor.getPhone());
-        holder.tvVendorRemarks.setText(vendor.getRemarks());
+        if(StringUtils.isNotBlank(vendor.getRemarks()))
+            holder.tvVendorRemarks.setText(vendor.getRemarks());
+        else
+            holder.tvVendorRemarks.setVisibility(View.GONE);
 
         holder.btnDelete.setOnClickListener(v -> clickListener.click(position,"DELETE"));
         holder.btnEdit.setOnClickListener(v -> clickListener.click(position,"EDIT"));

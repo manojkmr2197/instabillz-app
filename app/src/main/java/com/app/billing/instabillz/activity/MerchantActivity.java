@@ -18,16 +18,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.app.billing.instabillz.R;
 import com.app.billing.instabillz.constants.AppConstants;
-import com.app.billing.instabillz.model.PrinterDataModel;
+import com.app.billing.instabillz.model.ShopsModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -44,7 +40,7 @@ public class MerchantActivity extends AppCompatActivity {
     Activity activity;
     SharedPrefHelper sharedPrefHelper;
 
-    PrinterDataModel printerDataModel = new PrinterDataModel();
+    ShopsModel printerDataModel = new ShopsModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,9 +109,9 @@ public class MerchantActivity extends AppCompatActivity {
             public void onSuccess(Object data) {
                 DocumentSnapshot doc = (DocumentSnapshot) data;
                 if (doc.exists()) {
-                    printerDataModel = doc.toObject(PrinterDataModel.class);
+                    printerDataModel = doc.toObject(ShopsModel.class);
 
-                    if (printerDataModel != null && printerDataModel.getActive()) {
+                    if (printerDataModel != null && printerDataModel.isActive()) {
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                         LocalDate subscriptionDate = LocalDate.parse(printerDataModel.getSubscriptionDate(), formatter);
                         LocalDate today = LocalDate.now();

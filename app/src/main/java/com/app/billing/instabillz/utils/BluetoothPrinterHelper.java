@@ -8,14 +8,12 @@ import android.widget.Toast;
 
 import com.app.billing.instabillz.R;
 import com.app.billing.instabillz.model.InvoiceModel;
-import com.app.billing.instabillz.model.PrinterDataModel;
 import com.app.billing.instabillz.model.ProductModel;
+import com.app.billing.instabillz.model.ShopsModel;
 import com.dantsu.escposprinter.EscPosPrinter;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
 import com.dantsu.escposprinter.textparser.PrinterTextParserImg;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,7 +29,7 @@ public class BluetoothPrinterHelper {
         this.activity = activity;
     }
 
-    public void printSmallFontReceipt(InvoiceModel billData, PrinterDataModel printerDataModel) {
+    public void printSmallFontReceipt(InvoiceModel billData, ShopsModel printerDataModel) {
 
         try {
             BluetoothConnection printerConnection = BluetoothPrintersConnections.selectFirstPaired();

@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 import com.app.billing.instabillz.constants.SharedConstants;
 import com.app.billing.instabillz.model.EmployeeModel;
-import com.app.billing.instabillz.model.PrinterDataModel;
+import com.app.billing.instabillz.model.ShopsModel;
 import com.google.gson.Gson;
 
 public class SharedPrefHelper {
@@ -52,22 +52,22 @@ public class SharedPrefHelper {
     }
 
 
-    public void setPrinterDetails(PrinterDataModel printerDataModel) {
+    public void setPrinterDetails(ShopsModel shopsModel) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         Gson gson = new Gson();
-        String json = gson.toJson(printerDataModel); // ✅ Convert model to JSON string
+        String json = gson.toJson(shopsModel); // ✅ Convert model to JSON string
         editor.putString(SharedConstants.INSTABILLZ_PRINTER_DETAILS, json);
 
         editor.apply(); // ✅ commit() not needed after apply()
     }
 
-    public PrinterDataModel getPrinterDetails() {
+    public ShopsModel getPrinterDetails() {
         Gson gson = new Gson();
         String json = sharedPreferences.getString(SharedConstants.INSTABILLZ_PRINTER_DETAILS, null);
 
         if (json != null) {
-            return gson.fromJson(json, PrinterDataModel.class); // ✅ Convert JSON to model
+            return gson.fromJson(json, ShopsModel.class); // ✅ Convert JSON to model
         } else {
             return null;
         }

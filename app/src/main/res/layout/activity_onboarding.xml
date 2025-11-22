@@ -118,6 +118,42 @@
                         android:hint="Address Area *"
                         android:singleLine="true" />
 
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="5dp"
+                        android:text="Outlet Type"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                    <Spinner
+                        android:id="@+id/outlet_type_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
+                        android:background="@drawable/spinner_bg" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="5dp"
+                        android:text="Billing Type"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                    <Spinner
+                        android:id="@+id/billing_type_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
+                        android:background="@drawable/spinner_bg" />
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

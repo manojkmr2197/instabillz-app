@@ -15,10 +15,12 @@ import android.os.Looper;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +54,8 @@ public class OnboardingActivity extends AppCompatActivity {
 
     EditText edtShopName, edtPhone, edtAddress;
     ImageView imgPreview;
-    TextView txtFileName, txtSelectedDate;
+    TextView txtFileName, txtSelectedDate,back;
+    Spinner outletSpinner,billingTypeSpinner;
 
     Uri selectedImageUri = null;
 
@@ -81,6 +84,14 @@ public class OnboardingActivity extends AppCompatActivity {
         context = OnboardingActivity.this;
         activity = OnboardingActivity.this;
 
+        back = findViewById(R.id.onboarding_back);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         edtShopName = findViewById(R.id.edtShopName);
         edtPhone = findViewById(R.id.edtPhone);
         edtAddress = findViewById(R.id.edtAddress);
@@ -89,6 +100,23 @@ public class OnboardingActivity extends AppCompatActivity {
         txtFileName = findViewById(R.id.txtFileName);
 
         txtSelectedDate = findViewById(R.id.txtSelectedDate);
+        outletSpinner = (Spinner) findViewById(R.id.outlet_type_spinner);
+        ArrayAdapter<CharSequence> outletTypeAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.spinner_outlet_type,
+                android.R.layout.simple_spinner_item
+        );
+        outletTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        outletSpinner.setAdapter(outletTypeAdapter);
+
+        billingTypeSpinner = (Spinner) findViewById(R.id.billing_type_spinner);
+        ArrayAdapter<CharSequence> billingTypeAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.spinner_billing_type,
+                android.R.layout.simple_spinner_item
+        );
+        billingTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        billingTypeSpinner.setAdapter(billingTypeAdapter);
 
         findViewById(R.id.btnChooseLogo).setOnClickListener(v -> openImagePicker());
         findViewById(R.id.btnPickDate).setOnClickListener(v -> openDatePicker());
@@ -232,6 +260,8 @@ public class OnboardingActivity extends AppCompatActivity {
         model.setPhoneNumber(edtPhone.getText().toString().trim());
         model.setAddress(edtAddress.getText().toString().trim());
         model.setOnboardingDate(new Date());
+        model.setOutletType(outletSpinner.getSelectedItem().toString());
+        model.setBillingType(billingTypeSpinner.getSelectedItem().toString());
 
         // ---------- LOGO ----------
         model.setLogo(imageUrl);

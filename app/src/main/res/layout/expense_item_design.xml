@@ -22,7 +22,7 @@
         <!-- Delete Icon -->
         <ImageView
             android:id="@+id/expense_item_close"
-            android:layout_width="36dp"
+            android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="6dp"

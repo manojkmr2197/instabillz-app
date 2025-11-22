@@ -74,4 +74,19 @@
         <item>Last 6 Months</item>
     </string-array>
 
+    <string-array name="spinner_outlet_type">
+        <item>Quick Service [POS]</item>
+        <item>Fine Dine Restaurant</item>
+        <item>Retail Shop</item>
+        <item>Ice Cream</item>
+        <item>Bakery</item>
+        <item>Super Market</item>
+    </string-array>
+
+    <string-array name="spinner_billing_type">
+        <item>Quick Billing</item>
+        <item>Product QR Billing</item>
+        <item>Restaurant Dining / Kitchen</item>
+    </string-array>
+
 </resources>

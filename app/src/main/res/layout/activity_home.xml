@@ -35,8 +35,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -44,6 +44,7 @@
                         android:text="InstaBillz"
                         android:textColor="@color/app_color"
                         android:textSize="20sp" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -53,94 +54,200 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/home_attendance_tv"
                     android:layout_width="32dp"
                     android:layout_height="34dp"
                     android:layout_gravity="center_vertical"
+                    android:layout_margin="5dp"
                     android:background="@drawable/baseline_access_time_24"
                     android:contentDescription="Attendance"
                     android:scaleType="centerInside"
-                    android:id="@+id/home_attendance_tv"
-                    android:tint="@color/app_color"
-                    android:layout_margin="5dp" />
+                    android:tint="@color/app_color" />
 
                 <TextView
+                    android:id="@+id/home_today_invoice_tv"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="5dp"
                     android:background="@drawable/baseline_receipt_24"
                     android:contentDescription="Today's Invoices"
                     android:scaleType="centerInside"
-                    android:tint="@color/app_color"
-                    android:id="@+id/home_today_invoice_tv"
-                    android:layout_gravity="center_vertical"
-                    android:layout_margin="5dp" />
+                    android:tint="@color/app_color" />
 
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/home_etSearch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Search product"
-                android:padding="12dp"
-                android:layout_margin="5sp"
-                android:background="@drawable/search_bg"
-                android:textSize="16sp"
-                android:singleLine="true"
-                android:dropDownHeight="200dp"
-                android:completionThreshold="1"/>
-
-            <!-- ✅ Add this block below EditText -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/home_layout_categories"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="6dp" />
-            </HorizontalScrollView>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/home_recyclerView"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="always" />
+                android:layout_weight="1">
+
+                <!--Grid Layout Design-->
+                <LinearLayout
+                    android:id="@+id/home_bill_grid_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <EditText
+                        android:id="@+id/home_etSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5sp"
+                        android:background="@drawable/search_bg"
+                        android:completionThreshold="1"
+                        android:dropDownHeight="200dp"
+                        android:hint="Search product"
+                        android:padding="12dp"
+                        android:singleLine="true"
+                        android:textSize="16sp" />
+
+                    <!-- ✅ Add this block below EditText -->
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/home_layout_categories"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="6dp" />
+                    </HorizontalScrollView>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/home_bill_grid_recyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:nestedScrollingEnabled="false"
+                        android:overScrollMode="always" />
+
+
+                </LinearLayout>
+
+                <!--Scan Layout Design-->
+                <LinearLayout
+                    android:id="@+id/home_bill_scan_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.camera.view.PreviewView
+                        android:id="@+id/home_bill_scan_preview_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:layout_margin="5dp"
+                        android:background="#000" />
+
+                    <LinearLayout
+                        android:id="@+id/searchContainer"
+                        android:orientation="vertical"
+                        android:padding="5dp"
+                        android:layout_margin="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible"
+                        android:background="#FFFFFF"
+                        android:elevation="4dp">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/home_bill_scan_autoCompleteSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="Search product..."
+                            android:padding="5dp"
+                            android:background="@drawable/autocomplete_bg"
+                            android:textColor="#000"
+                            android:textSize="16sp"
+                            android:dropDownHeight="wrap_content"
+                            android:dropDownVerticalOffset="5dp"
+                            android:dropDownSelector="@android:color/darker_gray"/>
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <!-- Cart List -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/home_bill_scan_recyclerview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            android:padding="10dp" />
+
+                        <LinearLayout
+                            android:id="@+id/home_bill_scan_empty_view"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="20dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp">
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:src="@android:drawable/ic_menu_search"
+                                app:tint="#9E9E9E"/>
+
+                            <TextView
+                                android:layout_marginTop="10dp"
+                                android:text="No items in cart"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="#616161"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+
+                            <TextView
+                                android:layout_marginTop="5dp"
+                                android:text="Scan a product to add to your bill"
+                                android:textSize="14sp"
+                                android:textColor="#9E9E9E"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="70sp"
-                android:gravity="center"
-                android:layout_gravity="bottom|center">
+                android:layout_gravity="bottom|center"
+                android:gravity="center">
 
                 <Button
                     android:id="@+id/home_preview"
                     android:layout_width="40sp"
-                    android:layout_gravity="center"
                     android:layout_height="40sp"
-                    app:backgroundTint="@color/app_color"
-                    android:background="@drawable/baseline_preview_24" />
+                    android:layout_gravity="center"
+                    android:background="@drawable/baseline_preview_24"
+                    app:backgroundTint="@color/app_color" />
 
 
                 <Button
                     android:id="@+id/home_submit_invoice"
                     android:layout_width="200sp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginEnd="40sp"
-                    android:gravity="center"
                     android:backgroundTint="@color/app_color"
-                    android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text="Submit Invoice" />
 
 
-
             </LinearLayout>
+
         </LinearLayout>
 
 
@@ -154,7 +261,6 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/menu_main" />
-
 
 
 </androidx.drawerlayout.widget.DrawerLayout>
