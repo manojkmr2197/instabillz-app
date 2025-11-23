@@ -1,5 +1,6 @@
 package com.app.billing.instabillz.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,13 +39,20 @@ public class ScanCartAdapter extends RecyclerView.Adapter<ScanCartViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ScanCartViewHolder h, int i) {
+    public void onBindViewHolder(@NonNull ScanCartViewHolder h, @SuppressLint("RecyclerView") int i) {
         ProductModel item = cartModelsList.get(i);
 
         h.tvName.setText(item.getName());
-        h.tvQty.setText("Qty: " + item.getQty());
+        h.tvQty.setText("" + item.getQty());
         h.tvUnitPrice.setText("₹ " + item.getPrice());
         h.tvPrice.setText("₹ " + (item.getQty() * item.getPrice()));
+        h.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                billingClickListener.click(i, "DELETE");
+            }
+        });
+
     }
 
     @Override

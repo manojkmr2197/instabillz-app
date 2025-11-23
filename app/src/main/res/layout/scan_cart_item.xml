@@ -8,7 +8,7 @@
     android:layout_height="wrap_content">
 
     <ImageButton
-        android:id="@+id/shop_item_delete"
+        android:id="@+id/cart_item_delete"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_gravity="center"
@@ -27,9 +27,9 @@
 
     <TextView
         android:id="@+id/tvQty"
-        android:text="Qty: 1"
+        android:text="1"
         android:layout_width="0dp"
-        android:layout_weight="0.5"
+        android:layout_weight="0.4"
         android:textSize="12sp"
         android:layout_height="wrap_content" />
 
@@ -37,7 +37,7 @@
         android:id="@+id/tvUnitPrice"
         android:text="₹0"
         android:layout_width="0dp"
-        android:layout_weight="0.5"
+        android:layout_weight="0.3"
         android:textSize="12sp"
         android:layout_height="wrap_content" />
 
@@ -47,7 +47,7 @@
         android:layout_width="0dp"
         android:layout_weight="0.5"
         android:textSize="12sp"
-        android:textAlignment="textEnd"
+        android:textAlignment="center"
         android:layout_height="wrap_content" />
 
 </LinearLayout>

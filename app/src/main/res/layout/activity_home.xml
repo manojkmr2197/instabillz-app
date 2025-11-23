@@ -137,79 +137,152 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <androidx.camera.view.PreviewView
-                        android:id="@+id/home_bill_scan_preview_view"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="150dp"
-                        android:layout_margin="5dp"
-                        android:background="#000" />
+                        android:layout_height="wrap_content">
+
+                        <androidx.camera.view.PreviewView
+                            android:id="@+id/home_bill_scan_preview_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            android:layout_margin="5dp"
+                            android:background="#000" />
+
+                        <Button
+                            android:id="@+id/btnToggleCamera"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|center"
+                            android:backgroundTint="@color/app_color"
+                            android:padding="10dp"
+                            android:text="Start Camera"
+                            android:textSize="10sp" />
+                    </FrameLayout>
 
                     <LinearLayout
                         android:id="@+id/searchContainer"
-                        android:orientation="vertical"
-                        android:padding="5dp"
-                        android:layout_margin="5dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="visible"
+                        android:layout_margin="5dp"
                         android:background="#FFFFFF"
-                        android:elevation="4dp">
+                        android:elevation="4dp"
+                        android:orientation="vertical"
+                        android:padding="5dp"
+                        android:visibility="visible">
 
                         <AutoCompleteTextView
                             android:id="@+id/home_bill_scan_autoCompleteSearch"
                             android:layout_width="match_parent"
                             android:layout_height="48dp"
-                            android:hint="Search product..."
-                            android:padding="5dp"
                             android:background="@drawable/autocomplete_bg"
-                            android:textColor="#000"
-                            android:textSize="16sp"
                             android:dropDownHeight="wrap_content"
                             android:dropDownVerticalOffset="5dp"
-                            android:dropDownSelector="@android:color/darker_gray"/>
+                            android:dropDownSelector="@android:color/darker_gray"
+                            android:hint="Search product..."
+                            android:padding="5dp"
+                            android:textColor="#000"
+                            android:singleLine="true"
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <!-- Cart List -->
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/home_bill_scan_recyclerview"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:visibility="gone"
-                            android:padding="10dp" />
+                            android:id="@+id/home_bill_scan_content_view"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:padding="5dp"
+                                android:text="🛒 Your Cart"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <!--Header-->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center">
+                                <View
+                                    android:layout_width="25dp"
+                                    android:layout_height="25dp" />
+
+                                <TextView
+                                    android:text="Product Name"
+                                    android:textStyle="bold"
+                                    android:layout_weight="1"
+                                    android:textSize="12sp"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content" />
+
+                                <TextView
+                                    android:text="Qty"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="0.4"
+                                    android:textSize="12sp"
+                                    android:layout_height="wrap_content" />
+
+                                <TextView
+                                    android:text="Price"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="0.3"
+                                    android:textSize="11sp"
+                                    android:layout_height="wrap_content" />
+
+                                <TextView
+                                    android:text="Total"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="0.5"
+                                    android:textSize="12sp"
+                                    android:textAlignment="center"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/home_bill_scan_recyclerview"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="3dp" />
+                        </LinearLayout>
 
                         <LinearLayout
                             android:id="@+id/home_bill_scan_empty_view"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="20dp"
                             android:layout_width="match_parent"
-                            android:layout_height="200dp">
+                            android:layout_height="200dp"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="20dp">
 
                             <ImageView
                                 android:layout_width="80dp"
                                 android:layout_height="80dp"
                                 android:src="@android:drawable/ic_menu_search"
-                                app:tint="#9E9E9E"/>
+                                app:tint="#9E9E9E" />
 
                             <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
                                 android:text="No items in cart"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
                                 android:textColor="#616161"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
 
                             <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp"
                                 android:text="Scan a product to add to your bill"
-                                android:textSize="14sp"
                                 android:textColor="#9E9E9E"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 

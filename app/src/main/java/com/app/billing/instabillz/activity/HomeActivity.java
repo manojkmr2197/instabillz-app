@@ -1,6 +1,7 @@
 package com.app.billing.instabillz.activity;
 
 import static com.app.billing.instabillz.utils.SingleTon.getStartOfTodayEpoch;
+import static com.app.billing.instabillz.utils.SingleTon.hideKeyboard;
 import static com.app.billing.instabillz.utils.SingleTon.isSameDay;
 
 import android.Manifest;
@@ -25,6 +26,7 @@ import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Size;
 import android.view.Gravity;
@@ -132,17 +134,21 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     String selectedCategory = "", searchString = "";
     List<String> categoryModelList = new ArrayList<>();
 
-    LinearLayout gridLayout, scanLayout, emptyLayout;
+    LinearLayout gridLayout, scanLayout, emptyLayout,contentLayout;
 
     List<ProductModel> scanCartItems = new ArrayList<>();
     BillingClickListener scanCartListener;
     ScanCartAdapter scanLayoutAdapter;
     RecyclerView scanCartRecyclerView;
     AutoCompleteTextView autoSearch;
+    ProductDropDownAdapter dropDownAdapter;
 
     PreviewView previewScanView;
     private boolean isProcessingScan = false;
     private Executor executor = Executors.newSingleThreadExecutor();
+    private ProcessCameraProvider cameraProvider;
+    private boolean isCameraRunning = false;
+    private Button btnToggleCamera;
 
 
     SharedPrefHelper sharedPrefHelper;
@@ -265,6 +271,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         gridLayout = findViewById(R.id.home_bill_grid_layout);
         scanLayout = findViewById(R.id.home_bill_scan_layout);
         emptyLayout = findViewById(R.id.home_bill_scan_empty_view);
+        contentLayout = findViewById(R.id.home_bill_scan_content_view);
 
         //GRID Layout Declarations / Functionalities
         layoutCategories = findViewById(R.id.home_layout_categories);
@@ -309,34 +316,38 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         });
 
         //Scan Layout Functionalities
-        autoSearch = findViewById(R.id.home_bill_scan_autoCompleteSearch);
+        autoSearch = (AutoCompleteTextView) findViewById(R.id.home_bill_scan_autoCompleteSearch);
+        autoSearch.setThreshold(1); // show results after 1 character typed
+        autoSearch.setDropDownHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        autoSearch.setDropDownWidth(ViewGroup.LayoutParams.MATCH_PARENT);
 
-        ProductDropDownAdapter dropDownAdapter = new ProductDropDownAdapter(
-                this,
-                products   // your List<ProductModel>
-        );
-        autoSearch.setAdapter(dropDownAdapter);
+
 
         // When user selects a product
         autoSearch.setOnItemClickListener((parent, view, position, id) -> {
             ProductModel selected = (ProductModel) parent.getItemAtPosition(position);
-            syncScanProducts(selected);
+            hideKeyboard(context,activity);
+            showQtyDialog(selected);
         });
 
         scanCartListener = new BillingClickListener() {
             @Override
             public void click(int index, String type) {
                 if ("DELETE".equalsIgnoreCase(type)) {
-                    scanCartItems.remove(index);
-                    scanLayoutAdapter.notifyDataSetChanged();
-                    scanCartRecyclerView.smoothScrollToPosition(scanCartItems.size() - 1);
-                    if (scanCartItems.isEmpty()) {
-                        emptyLayout.setVisibility(View.VISIBLE);
-                        scanCartRecyclerView.setVisibility(View.GONE);
-                    }
+                    showDeleteConfirmDialog(index);
                 }
             }
         };
+        btnToggleCamera = findViewById(R.id.btnToggleCamera);
+
+        btnToggleCamera.setOnClickListener(v -> {
+            if (isCameraRunning) {
+                stopCamera();
+            } else {
+                askCameraPermission(); // this will call startCamera()
+            }
+        });
+
         previewScanView = (PreviewView) findViewById(R.id.home_bill_scan_preview_view);
         scanCartRecyclerView = (RecyclerView) findViewById(R.id.home_bill_scan_recyclerview);
         scanLayoutAdapter = new ScanCartAdapter(context, scanCartItems, scanCartListener);
@@ -350,25 +361,115 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             gridLayout.setVisibility(View.GONE);
             scanLayout.setVisibility(View.VISIBLE);
             emptyLayout.setVisibility(View.VISIBLE);
-            askCameraPermission();
+            //askCameraPermission();
         }
 
         enableBluetooth();
     }
 
-    private void syncScanProducts(ProductModel selected) {
+    private void showDeleteConfirmDialog(int index) {
+
+        Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_delete_confirmation);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        // Zomato bottom slide animation
+        dialog.getWindow().getAttributes().windowAnimations = R.style.BottomDialogAnimation;
+
+        TextView tvMessage = dialog.findViewById(R.id.tvMessage);
+        TextView tvSubMessage = dialog.findViewById(R.id.tvSubMessage);
+        Button btnDelete = dialog.findViewById(R.id.btnDelete);
+        Button btnCancel = dialog.findViewById(R.id.btnCancel);
+
+        tvMessage.setText("Remove item?");
+        tvSubMessage.setText("This action cannot be undone.");
+
+        btnDelete.setOnClickListener(v -> {
+            scanCartItems.remove(index);
+            scanLayoutAdapter.notifyDataSetChanged();
+            dialog.dismiss();
+
+            if (scanCartItems.isEmpty()) {
+                emptyLayout.setVisibility(View.VISIBLE);
+                contentLayout.setVisibility(View.GONE);
+            } else {
+                emptyLayout.setVisibility(View.GONE);
+                contentLayout.setVisibility(View.VISIBLE);
+                scanCartRecyclerView.smoothScrollToPosition(scanCartItems.size() - 1);
+            }
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+
+    private void showQtyDialog(ProductModel product) {
+
+        Dialog dialog = new Dialog(this);
+        View sheetView = getLayoutInflater().inflate(R.layout.cart_dialog_qty, null);
+        dialog.setContentView(sheetView);
+        dialog.setCanceledOnTouchOutside(false);
+
+        // Transparent background for rounded corners
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            dialog.getWindow().getAttributes().windowAnimations = R.style.BottomDialogAnimation;
+        }
+
+        TextView tvName = dialog.findViewById(R.id.tvProductName);
+        TextView btnMinus = dialog.findViewById(R.id.btnMinus);
+        TextView btnPlus = dialog.findViewById(R.id.btnPlus);
+        EditText etQty = dialog.findViewById(R.id.etQty);
+        Button btnSubmit = dialog.findViewById(R.id.btnSubmit);
+
+        tvName.setText("Enter " + product.getName() + " Quantity");
+
+        // Minus button
+        btnMinus.setOnClickListener(v -> {
+            int qty = Integer.parseInt(etQty.getText().toString());
+            if (qty > 1) {
+                etQty.setText(String.valueOf(qty - 1));
+            }
+        });
+
+        // Plus button
+        btnPlus.setOnClickListener(v -> {
+            int qty = Integer.parseInt(etQty.getText().toString());
+            etQty.setText(String.valueOf(qty + 1));
+        });
+
+        btnSubmit.setOnClickListener(v -> {
+            String qtyStr = etQty.getText().toString().trim();
+            if (!qtyStr.isEmpty() && Integer.parseInt(qtyStr) > 0) {
+                syncScanProducts(product, Integer.parseInt(qtyStr));
+                dialog.dismiss();
+            } else {
+                Toast.makeText(activity, "Enter valid quantity", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+
+    private void syncScanProducts(ProductModel selected,int qty) {
         boolean found = false;
 
         for (ProductModel item : scanCartItems) {
             if (item.getName().equals(selected.getName())) {   // or use ID if available
-                item.setQty(item.getQty() + 1);  // Increase quantity
+                item.setQty(item.getQty() + qty);  // Increase quantity
                 found = true;
                 break;
             }
         }
 
         if (!found) {
-            selected.setQty(1);   // default qty for new item
+            selected.setQty(qty);   // default qty for new item
             scanCartItems.add(selected);
         }
 
@@ -376,7 +477,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         scanCartRecyclerView.smoothScrollToPosition(scanCartItems.size() - 1);
         if (scanCartItems.isEmpty()) {
             emptyLayout.setVisibility(View.VISIBLE);
-            scanCartRecyclerView.setVisibility(View.GONE);
+            contentLayout.setVisibility(View.GONE);
+        }else{
+            emptyLayout.setVisibility(View.GONE);
+            contentLayout.setVisibility(View.VISIBLE);
         }
         autoSearch.setText(""); // clear search
     }
@@ -522,19 +626,32 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         StringBuilder sb = new StringBuilder();
         final double[] total = {0};
-
-
         List<ProductModel> billItems = new ArrayList<>();
-        for (ProductModel product : products) {
-            if (product.getQty() > 0) {
-                billItems.add(product);
-                sb.append(product.getName())
-                        .append(" x ")
-                        .append(product.getQty())
-                        .append(" = ₹")
-                        .append(product.getQty() * product.getPrice())
-                        .append("\n");
-                total[0] += product.getQty() * product.getPrice();
+        if ("Quick Billing".equalsIgnoreCase(shopsModel.getBillingType())) {
+            for (ProductModel product : products) {
+                if (product.getQty() > 0) {
+                    billItems.add(product);
+                    sb.append(product.getName())
+                            .append(" x ")
+                            .append(product.getQty())
+                            .append(" = ₹")
+                            .append(product.getQty() * product.getPrice())
+                            .append("\n");
+                    total[0] += product.getQty() * product.getPrice();
+                }
+            }
+        } else if ("Product QR Billing".equalsIgnoreCase(shopsModel.getBillingType())) {
+            for (ProductModel product : scanCartItems) {
+                if (product.getQty() > 0) {
+                    billItems.add(product);
+                    sb.append(product.getName())
+                            .append(" x ")
+                            .append(product.getQty())
+                            .append(" = ₹")
+                            .append(product.getQty() * product.getPrice())
+                            .append("\n");
+                    total[0] += product.getQty() * product.getPrice();
+                }
             }
         }
 
@@ -800,15 +917,29 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         StringBuilder sb = new StringBuilder();
         double total = 0;
 
-        for (ProductModel product : products) {
-            if (product.getQty() > 0) {
-                sb.append(product.getName())
-                        .append(" x ")
-                        .append(product.getQty())
-                        .append(" = ₹")
-                        .append(product.getQty() * product.getPrice())
-                        .append("\n");
-                total += product.getQty() * product.getPrice();
+        if ("Quick Billing".equalsIgnoreCase(shopsModel.getBillingType())) {
+            for (ProductModel product : products) {
+                if (product.getQty() > 0) {
+                    sb.append(product.getName())
+                            .append(" x ")
+                            .append(product.getQty())
+                            .append(" = ₹")
+                            .append(product.getQty() * product.getPrice())
+                            .append("\n");
+                    total += product.getQty() * product.getPrice();
+                }
+            }
+        } else if ("Product QR Billing".equalsIgnoreCase(shopsModel.getBillingType())) {
+            for (ProductModel product : scanCartItems) {
+                if (product.getQty() > 0) {
+                    sb.append(product.getName())
+                            .append(" x ")
+                            .append(product.getQty())
+                            .append(" = ₹")
+                            .append(product.getQty() * product.getPrice())
+                            .append("\n");
+                    total += product.getQty() * product.getPrice();
+                }
             }
         }
 
@@ -877,13 +1008,24 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             public void onSuccess(Object data) {
                 products.clear();
                 filteredList.clear();
+                scanCartItems.clear();
                 QuerySnapshot documentSnapshotList = (QuerySnapshot) data;
                 for (DocumentSnapshot doc : documentSnapshotList) {
                     products.add(doc.toObject(ProductModel.class));
                 }
                 filteredList.addAll(products);
                 gridLayoutAdapter.notifyDataSetChanged();
-
+                if (scanCartItems.isEmpty()) {
+                    emptyLayout.setVisibility(View.VISIBLE);
+                    contentLayout.setVisibility(View.GONE);
+                }else{
+                    emptyLayout.setVisibility(View.GONE);
+                    contentLayout.setVisibility(View.VISIBLE);
+                }
+                scanLayoutAdapter.notifyDataSetChanged();
+                dropDownAdapter = new ProductDropDownAdapter(context, products);
+                autoSearch.setAdapter(dropDownAdapter);
+                dropDownAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -972,6 +1114,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void stopCamera() {
+        if (cameraProvider != null) {
+            cameraProvider.unbindAll();
+            isCameraRunning = false;
+            btnToggleCamera.setText("Start Camera");
+        }
+    }
+
 
     private void startCamera() {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
@@ -979,8 +1129,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         cameraProviderFuture.addListener(() -> {
             try {
-                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                cameraProvider = cameraProviderFuture.get();  // save provider globally
                 bindCamera(cameraProvider);
+                isCameraRunning = true;
+                btnToggleCamera.setText("Stop Camera");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1041,12 +1193,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 if (doc.exists()) {
                     ProductModel scannedProduct = doc.toObject(ProductModel.class);
                     if (scannedProduct != null) {
-                        syncScanProducts(scannedProduct);
+                        showQtyDialog(scannedProduct);
                         unlockScannerAfterDelay();
                     } else {
                         Toast.makeText(context, "Product not found in inventory. Add details to continue.", Toast.LENGTH_SHORT).show();
                         fetchFromAPI(barcode);
                     }
+                }else{
+                    Toast.makeText(context, "Product not found in inventory. Add details to continue.", Toast.LENGTH_SHORT).show();
+                    fetchFromAPI(barcode);
                 }
             }
             @Override
@@ -1176,7 +1331,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 public void onSuccess(Object orderId) {
                     Toast.makeText(context, "Products Updated", Toast.LENGTH_LONG).show();
                     products.add(newProductModel);
-                    syncScanProducts(newProductModel);
+                    showQtyDialog(newProductModel);
                 }
 
                 @Override

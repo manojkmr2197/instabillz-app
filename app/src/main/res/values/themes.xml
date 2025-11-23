@@ -38,6 +38,11 @@
         <item name="android:windowEnterAnimation">@anim/slide_down</item>
         <item name="android:windowExitAnimation">@anim/slide_up</item>
     </style>
+    <style name="BottomDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/bottom_enter</item>
+        <item name="android:windowExitAnimation">@anim/bottom_exit</item>
+    </style>
+
 
 
 </resources>

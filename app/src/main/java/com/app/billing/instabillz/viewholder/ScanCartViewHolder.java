@@ -19,6 +19,7 @@ public class ScanCartViewHolder extends RecyclerView.ViewHolder {
         tvQty = v.findViewById(R.id.tvQty);
         tvUnitPrice = v.findViewById(R.id.tvUnitPrice);
         tvPrice = v.findViewById(R.id.tvPrice);
+        delete = v.findViewById(R.id.cart_item_delete);
     }
 
 }
