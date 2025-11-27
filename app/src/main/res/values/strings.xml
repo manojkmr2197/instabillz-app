@@ -86,7 +86,7 @@
     <string-array name="spinner_billing_type">
         <item>Quick Billing</item>
         <item>Product QR Billing</item>
-        <item>Restaurant Dining / Kitchen</item>
+<!--        <item>Restaurant Dining / Kitchen</item>-->
     </string-array>
 
 </resources>
