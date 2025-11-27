@@ -30,6 +30,7 @@ import com.app.billing.instabillz.listener.BillingClickListener;
 import com.app.billing.instabillz.model.CategoryModel;
 import com.app.billing.instabillz.model.ProductModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -52,6 +53,8 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
     CategoryViewAdapter adapter;
     BillingClickListener listener;
 
+    SharedPrefHelper sharedPrefHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +72,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
 
         context = CategoryActivity.this;
         activity = CategoryActivity.this;
+        sharedPrefHelper = new SharedPrefHelper(this);
         recyclerView = (RecyclerView) findViewById(R.id.category_recyclerView);
         back = (TextView) findViewById(R.id.category_back);
         back.setOnClickListener(this);
@@ -125,7 +129,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
 
     private void loadCategoryList() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.CATEGORIES_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.CATEGORIES_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 categoryModelList.clear();
@@ -147,7 +151,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
     }
     private void deleteCategoryItem(int index){
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.CATEGORIES_COLLECTION, categoryModelList.get(index).getId(), new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().deleteData(sharedPrefHelper.getAppName() + AppConstants.CATEGORIES_COLLECTION, categoryModelList.get(index).getId(), new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 Toast.makeText(context, "Category Removed", Toast.LENGTH_LONG).show();
@@ -213,7 +217,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
             newCategoryModel.setId(SingleTon.generateCategoryDocument());
             newCategoryModel.setName(name.getText().toString().toUpperCase());
 
-            InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.CATEGORIES_COLLECTION, newCategoryModel.getId(), newCategoryModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.CATEGORIES_COLLECTION, newCategoryModel.getId(), newCategoryModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                 @Override
                 public void onSuccess(Object orderId) {
                     Toast.makeText(context, "Categories Updated", Toast.LENGTH_LONG).show();

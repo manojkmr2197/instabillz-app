@@ -170,7 +170,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
     private void removeAttendanceItem(int position) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
         String docId = attendanceModelList.get(position).getEmployeeName() + "_" + attendanceModelList.get(position).getDate();
-        InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION, docId, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().deleteData(sharedPrefHelper.getAppName() + AppConstants.ATTENDANCE_COLLECTION, docId, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {
@@ -219,7 +219,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
 
     private void loadEmployeeList() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.EMPLOYEE_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.EMPLOYEE_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {
@@ -313,7 +313,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
         System.out.println("AttendanceFilter " + employeeName + " | " + startDate + " → " + endDate);
 
         // 🔹 Build the query
-        Query query = db.collection(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION);
+        Query query = db.collection(sharedPrefHelper.getAppName() + AppConstants.ATTENDANCE_COLLECTION);
 
         if (!employeeName.equals("Select Employee") && !employeeName.equals("ALL")) {
             query = query.whereEqualTo("employeeName", employeeName);

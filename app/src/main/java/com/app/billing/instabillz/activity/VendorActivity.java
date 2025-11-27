@@ -38,6 +38,7 @@ import com.app.billing.instabillz.listener.BillingClickListener;
 import com.app.billing.instabillz.model.EmployeeModel;
 import com.app.billing.instabillz.model.VendorModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -59,6 +60,8 @@ public class VendorActivity extends AppCompatActivity {
     VendorViewAdapter adapter;
     List<VendorModel> vendorModelList;
 
+    SharedPrefHelper sharedPrefHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +79,7 @@ public class VendorActivity extends AppCompatActivity {
 
         context = VendorActivity.this;
         activity = VendorActivity.this;
+        sharedPrefHelper = new SharedPrefHelper(context);
 
         back = findViewById(R.id.vendor_back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -183,7 +187,7 @@ public class VendorActivity extends AppCompatActivity {
                 newVendorModel.setPhone(phoneStr);
                 newVendorModel.setRemarks(remarks.getText().toString());
 
-                InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.VENDOR_COLLECTION, newVendorModel.getId(), newVendorModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+                InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.VENDOR_COLLECTION, newVendorModel.getId(), newVendorModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
                     public void onSuccess(Object data) {
                         dialog.dismiss();
@@ -234,7 +238,7 @@ public class VendorActivity extends AppCompatActivity {
 
     private void deleteDBItem(String id) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.VENDOR_COLLECTION, id, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().deleteData(sharedPrefHelper.getAppName() + AppConstants.VENDOR_COLLECTION, id, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 Toast.makeText(context, "Employee Removed", Toast.LENGTH_LONG).show();
@@ -251,7 +255,7 @@ public class VendorActivity extends AppCompatActivity {
 
     private void loadVendorList() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.VENDOR_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.VENDOR_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {

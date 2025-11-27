@@ -40,6 +40,7 @@ import com.app.billing.instabillz.model.AttendanceModel;
 import com.app.billing.instabillz.model.ExpenseModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.AutoIndexHelper;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -56,6 +57,7 @@ public class ExpenseActivity extends AppCompatActivity {
 
     Context context;
     Activity activity;
+    SharedPrefHelper sharedPrefHelper;
 
     TextView back;
     RecyclerView recyclerView;
@@ -88,6 +90,7 @@ public class ExpenseActivity extends AppCompatActivity {
         context = ExpenseActivity.this;
         activity = ExpenseActivity.this;
         db = FirebaseFirestore.getInstance();
+        sharedPrefHelper = new SharedPrefHelper(this);
 
         back = findViewById(R.id.expense_back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -193,7 +196,7 @@ public class ExpenseActivity extends AppCompatActivity {
     private void removeExpenseItem(int position) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
         String docId = expenseModelList.get(position).getId();
-        InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.EXPENSE_COLLECTION, docId, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().deleteData(sharedPrefHelper.getAppName() + AppConstants.EXPENSE_COLLECTION, docId, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {
@@ -270,7 +273,7 @@ public class ExpenseActivity extends AppCompatActivity {
         System.out.println("ExpenseFilter " + expenseType + " | " + startDate + " → " + endDate);
 
         // 🔹 Build the query
-        Query query = db.collection(AppConstants.APP_NAME + AppConstants.EXPENSE_COLLECTION);
+        Query query = db.collection(sharedPrefHelper.getAppName() + AppConstants.EXPENSE_COLLECTION);
 
         if (!expenseType.equals("ALL")) {
             query = query.whereEqualTo("type", expenseType);
@@ -397,7 +400,7 @@ public class ExpenseActivity extends AppCompatActivity {
             expense.setAmount(amount);
             expense.setDescription(desc);
 
-            InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.EXPENSE_COLLECTION, expense.getId(), expense, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.EXPENSE_COLLECTION, expense.getId(), expense, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                 @Override
                 public void onSuccess(Object data) {
                     dialog.dismiss();

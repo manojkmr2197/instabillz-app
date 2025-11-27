@@ -609,6 +609,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         } else if (item.getItemId() == R.id.nav_shops) {
             i = new Intent(HomeActivity.this, ShopManagementActivity.class);
             startActivity(i);
+        } else if (item.getItemId() == R.id.nav_profile) {
+            i = new Intent(HomeActivity.this, ShopProfileActivity.class);
+            i.putExtra("shop_id",sharedPrefHelper.getAppName());
+            startActivity(i);
         }
         return true;
     }
@@ -782,7 +786,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private void saveNewBill(InvoiceModel newInvoice, boolean isPrintNeeded) {
         Toast.makeText(this, "Loading!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getLatestToken(new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getLatestToken(sharedPrefHelper.getAppName(),new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 QuerySnapshot doc = (QuerySnapshot) data;
@@ -797,7 +801,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 } else {
                     newInvoice.setToken(1);
                 }
-                InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.SALES_COLLECTION, String.valueOf(newInvoice.getBillingDate()), newInvoice, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+                InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.SALES_COLLECTION, String.valueOf(newInvoice.getBillingDate()), newInvoice, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
                     public void onSuccess(Object data) {
                         Toast.makeText(context, "🧾 New bill generated — Token #" + newInvoice.getToken(), Toast.LENGTH_LONG).show();
@@ -1003,7 +1007,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private void loadProductList() {
         //Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.PRODUCTS_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 products.clear();
@@ -1039,7 +1043,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void loadCategoryList() {
 
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.CATEGORIES_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.CATEGORIES_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 categoryModelList.clear();
@@ -1186,7 +1190,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private void showProductDetails(String barcode) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, barcode, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(sharedPrefHelper.getAppName() + AppConstants.PRODUCTS_COLLECTION, barcode, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 DocumentSnapshot doc = (DocumentSnapshot) data;
@@ -1326,7 +1330,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             newProductModel.setPrice(Double.parseDouble(productPrice.getText().toString()));
             newProductModel.setCategoryName(categorySpinner.getSelectedItem().toString());
 
-            InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, newProductModel.getId(), newProductModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.PRODUCTS_COLLECTION, newProductModel.getId(), newProductModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                 @Override
                 public void onSuccess(Object orderId) {
                     Toast.makeText(context, "Products Updated", Toast.LENGTH_LONG).show();

@@ -142,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void validateUser(String phone, String passcode) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().userLogin(phone, passcode, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().userLogin(sharedPrefHelper.getAppName(),phone, passcode, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 QuerySnapshot doc = (QuerySnapshot) data;

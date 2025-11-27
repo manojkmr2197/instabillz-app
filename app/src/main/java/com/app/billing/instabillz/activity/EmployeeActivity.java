@@ -38,6 +38,7 @@ import com.app.billing.instabillz.model.EmployeeModel;
 import com.app.billing.instabillz.model.ProductModel;
 import com.app.billing.instabillz.model.StockModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -55,6 +56,7 @@ public class EmployeeActivity extends AppCompatActivity {
 
     Context context;
     Activity activity;
+    SharedPrefHelper sharedPrefHelper;
 
     EditText search;
     List<EmployeeModel> filteredList;
@@ -79,6 +81,7 @@ public class EmployeeActivity extends AppCompatActivity {
 
         context = EmployeeActivity.this;
         activity = EmployeeActivity.this;
+        sharedPrefHelper = new SharedPrefHelper(this);
 
         back = (TextView) findViewById(R.id.employee_back);
         back.setOnClickListener(v -> {
@@ -169,7 +172,7 @@ public class EmployeeActivity extends AppCompatActivity {
 
     private void deleteDBItem(String id) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.EMPLOYEE_COLLECTION, id, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().deleteData(sharedPrefHelper.getAppName() + AppConstants.EMPLOYEE_COLLECTION, id, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 Toast.makeText(context, "Employee Removed", Toast.LENGTH_LONG).show();
@@ -186,7 +189,7 @@ public class EmployeeActivity extends AppCompatActivity {
 
     private void loadEmployeeList() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.EMPLOYEE_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.EMPLOYEE_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {
@@ -313,7 +316,7 @@ public class EmployeeActivity extends AppCompatActivity {
                 newEmployeeModel.setRole(roleSpinner.getSelectedItem().toString());
                 newEmployeeModel.setActive(availableCheckbox.isChecked());
 
-                InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.EMPLOYEE_COLLECTION, newEmployeeModel.getId(), newEmployeeModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+                InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.EMPLOYEE_COLLECTION, newEmployeeModel.getId(), newEmployeeModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
                     public void onSuccess(Object data) {
                         dialog.dismiss();

@@ -24,6 +24,7 @@ import com.app.billing.instabillz.R;
 import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.model.AttendanceModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -57,6 +58,8 @@ public class AttendanceActivity extends AppCompatActivity {
     Context context;
     Activity activity;
 
+    SharedPrefHelper sharedPrefHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +77,7 @@ public class AttendanceActivity extends AppCompatActivity {
         }
         context = AttendanceActivity.this;
         activity = AttendanceActivity.this;
+        sharedPrefHelper = new SharedPrefHelper(this);
 
         back = findViewById(R.id.attendance_back);
         btnLogin = findViewById(R.id.attendance_login_bt);
@@ -140,7 +144,7 @@ public class AttendanceActivity extends AppCompatActivity {
                         null
                 );
                 Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-                InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION, docId, login_attendance, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+                InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.ATTENDANCE_COLLECTION, docId, login_attendance, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
                     public void onSuccess(Object data) {
                         Toast.makeText(AttendanceActivity.this, "Login saved!", Toast.LENGTH_SHORT).show();
@@ -170,7 +174,7 @@ public class AttendanceActivity extends AppCompatActivity {
                 data.put("logoutTime", selectedTime);
                 data.put("workingHours", workingHours);
                 Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-                InstaFirebaseRepository.getInstance().updateData(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION, docId, data, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+                InstaFirebaseRepository.getInstance().updateData(sharedPrefHelper.getAppName() + AppConstants.ATTENDANCE_COLLECTION, docId, data, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
                     public void onSuccess(Object data) {
                         Toast.makeText(AttendanceActivity.this, "Logout updated!", Toast.LENGTH_SHORT).show();
@@ -217,7 +221,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
         String documentId = selectedEmployee + "_" + selectedDate;
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION, documentId, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(sharedPrefHelper.getAppName() + AppConstants.ATTENDANCE_COLLECTION, documentId, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 DocumentSnapshot doc = (DocumentSnapshot) data;
@@ -269,7 +273,7 @@ public class AttendanceActivity extends AppCompatActivity {
     // updated one
     private void loadEmployeesFromFirestore() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.EMPLOYEE_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.EMPLOYEE_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 QuerySnapshot querySnapshot = (QuerySnapshot) data;

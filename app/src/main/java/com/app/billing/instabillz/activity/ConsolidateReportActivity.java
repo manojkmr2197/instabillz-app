@@ -26,6 +26,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.app.billing.instabillz.R;
 import com.app.billing.instabillz.constants.AppConstants;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
@@ -75,6 +76,7 @@ public class ConsolidateReportActivity extends AppCompatActivity {
     final double[] totalUpi = {0};
     final double[] totalCash = {0};
 
+    SharedPrefHelper sharedPrefHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +94,7 @@ public class ConsolidateReportActivity extends AppCompatActivity {
 
         context = ConsolidateReportActivity.this;
         activity = ConsolidateReportActivity.this;
+        sharedPrefHelper = new SharedPrefHelper(this);
 
         back = findViewById(R.id.consolidate_report_back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -153,13 +156,13 @@ public class ConsolidateReportActivity extends AppCompatActivity {
 
 // 1️⃣ Products count
         Task<AggregateQuerySnapshot> productsTask =
-                db.collection(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION)
+                db.collection( sharedPrefHelper.getAppName()+ AppConstants.PRODUCTS_COLLECTION)
                         .count().get(AggregateSource.SERVER)
                         .addOnSuccessListener(snap -> productCount[0] = snap.getCount());
 
 // 2️⃣ Stocks count + nearly zero count
         Task<QuerySnapshot> stocksTask =
-                db.collection(AppConstants.APP_NAME + AppConstants.STOCKS_COLLECTION).get()
+                db.collection(sharedPrefHelper.getAppName()+ AppConstants.STOCKS_COLLECTION).get()
                         .addOnSuccessListener(snap -> {
                             stockCount[0] = snap.size();
                             nearZeroStockCount[0] = snap.getDocuments().stream()
@@ -169,7 +172,7 @@ public class ConsolidateReportActivity extends AppCompatActivity {
 
 // 3️⃣ Expense total in date range
         Task<QuerySnapshot> expenseTask =
-                db.collection(AppConstants.APP_NAME + AppConstants.EXPENSE_COLLECTION)
+                db.collection(sharedPrefHelper.getAppName() + AppConstants.EXPENSE_COLLECTION)
                         .whereGreaterThanOrEqualTo("date", sdf.format(startDate))
                         .whereLessThanOrEqualTo("date", sdf.format(endDate))
                         .get()
@@ -184,7 +187,7 @@ public class ConsolidateReportActivity extends AppCompatActivity {
 
 // 4️⃣ Attendance count
         Task<AggregateQuerySnapshot> attendanceTask =
-                db.collection(AppConstants.APP_NAME + AppConstants.ATTENDANCE_COLLECTION)
+                db.collection(sharedPrefHelper.getAppName() + AppConstants.ATTENDANCE_COLLECTION)
                         .whereGreaterThanOrEqualTo("date", sdf.format(startDate))
                         .whereLessThanOrEqualTo("date", sdf.format(endDate))
                         .count()
@@ -193,7 +196,7 @@ public class ConsolidateReportActivity extends AppCompatActivity {
 
 // 5️⃣ Invoice count + total sales + UPI vs CASH
         Task<QuerySnapshot> invoiceTask =
-                db.collection(AppConstants.APP_NAME + AppConstants.SALES_COLLECTION)
+                db.collection(sharedPrefHelper.getAppName() + AppConstants.SALES_COLLECTION)
                         .whereGreaterThanOrEqualTo("billingDate", startEpoch)
                         .whereLessThanOrEqualTo("billingDate", endEpoch)
                         .get()

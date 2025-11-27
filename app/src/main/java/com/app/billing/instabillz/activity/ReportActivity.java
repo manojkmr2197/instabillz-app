@@ -35,6 +35,7 @@ import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.model.InvoiceModel;
 import com.app.billing.instabillz.model.ProductModel;
 import com.app.billing.instabillz.utils.ReportGenerator;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -89,6 +90,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private ProductsSummaryAdapter productsAdapter;
 
+    SharedPrefHelper sharedPrefHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +107,7 @@ public class ReportActivity extends AppCompatActivity {
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
         db = FirebaseFirestore.getInstance();
+        sharedPrefHelper = new SharedPrefHelper(this);
 
         spinnerDateRange = findViewById(R.id.spinnerDateRange);
         tvCustomRange = findViewById(R.id.tvCustomRange);
@@ -249,7 +252,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private void loadInvoicesFromFirestore(long startEpoch, long endEpoch) {
         // Query by billingDate (assumes billingDate stored as epoch seconds)
-        db.collection(AppConstants.APP_NAME + AppConstants.SALES_COLLECTION)
+        db.collection(sharedPrefHelper.getAppName() + AppConstants.SALES_COLLECTION)
                 .whereGreaterThanOrEqualTo("billingDate", startEpoch)
                 .whereLessThanOrEqualTo("billingDate", endEpoch)
                 .orderBy("billingDate", Query.Direction.ASCENDING)

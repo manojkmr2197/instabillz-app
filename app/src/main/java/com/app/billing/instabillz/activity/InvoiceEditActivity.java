@@ -32,6 +32,7 @@ import com.app.billing.instabillz.listener.BillingClickListener;
 import com.app.billing.instabillz.model.InvoiceModel;
 import com.app.billing.instabillz.model.ProductModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -51,6 +52,7 @@ public class InvoiceEditActivity extends AppCompatActivity implements View.OnCli
 
     Context context;
     Activity activity;
+    SharedPrefHelper sharedPrefHelper;
 
     String[] paymentMode = {""};
 
@@ -87,6 +89,7 @@ public class InvoiceEditActivity extends AppCompatActivity implements View.OnCli
 
         context = InvoiceEditActivity.this;
         activity = InvoiceEditActivity.this;
+        sharedPrefHelper = new SharedPrefHelper(this);
 
         TextView back = (TextView) findViewById(R.id.invoice_edit_back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -250,7 +253,7 @@ public class InvoiceEditActivity extends AppCompatActivity implements View.OnCli
 
     private void updateInvoice() {
         editInvoiceModel.setProductModelList(productModelList);
-        InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.SALES_COLLECTION, String.valueOf(editInvoiceModel.getBillingDate()), editInvoiceModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.SALES_COLLECTION, String.valueOf(editInvoiceModel.getBillingDate()), editInvoiceModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 Toast.makeText(context, "🧾 Invoice bill updated — Token #" + editInvoiceModel.getToken(), Toast.LENGTH_LONG).show();
@@ -267,7 +270,7 @@ public class InvoiceEditActivity extends AppCompatActivity implements View.OnCli
 
     private void loadProductList() {
         //Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.PRODUCTS_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 allProducts.clear();

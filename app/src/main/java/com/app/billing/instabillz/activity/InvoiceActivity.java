@@ -426,7 +426,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
     private void deleteProductItem(int index) {
         Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.SALES_COLLECTION, String.valueOf(invoiceModelList.get(index).getBillingDate()), new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().deleteData(sharedPrefHelper.getAppName() + AppConstants.SALES_COLLECTION, String.valueOf(invoiceModelList.get(index).getBillingDate()), new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {
@@ -448,7 +448,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        Query query = db.collection(AppConstants.APP_NAME + AppConstants.SALES_COLLECTION);
+        Query query = db.collection(sharedPrefHelper.getAppName() + AppConstants.SALES_COLLECTION);
 
         // 1️⃣ Employee filter
         if (!selectedEmployee.equalsIgnoreCase("ALL")) {
@@ -530,7 +530,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
     private void loadEmployeeList() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.EMPLOYEE_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.EMPLOYEE_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {

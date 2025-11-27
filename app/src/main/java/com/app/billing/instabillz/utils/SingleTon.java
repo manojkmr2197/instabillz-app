@@ -100,6 +100,10 @@ public class SingleTon {
         return "EMPLOYEE-"+ UUID.randomUUID().toString();
     }
 
+    public static final String generateDummyDocument(){
+        return "DUMMY-DOCUMENT";
+    }
+
     public static Pair<Date, Date> getStartAndEndDate(String rangeType) {
         Calendar calendar = Calendar.getInstance();
         Date startDate;

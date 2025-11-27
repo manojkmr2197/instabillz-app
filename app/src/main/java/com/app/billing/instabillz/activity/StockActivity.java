@@ -44,6 +44,7 @@ import com.app.billing.instabillz.model.StockModel;
 import com.app.billing.instabillz.model.VendorModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.ReportGenerator;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -63,6 +64,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
 
     Context context;
     Activity activity;
+    SharedPrefHelper sharedPrefHelper;
 
     EditText stockSearch;
     List<StockModel> filteredList;
@@ -89,6 +91,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
 
         context = StockActivity.this;
         activity = StockActivity.this;
+        sharedPrefHelper = new SharedPrefHelper(this);
 
         back = (TextView) findViewById(R.id.stock_back);
         back.setOnClickListener(this);
@@ -219,7 +222,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
                     }
                     stockModel.setQuantity(stockModel.getQuantity() - qty);
                 }
-                InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.STOCKS_COLLECTION, stockModel.getId(), stockModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+                InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.STOCKS_COLLECTION, stockModel.getId(), stockModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
                     public void onSuccess(Object orderId) {
                         Toast.makeText(context, "Stock updated", Toast.LENGTH_LONG).show();
@@ -245,7 +248,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
 
     private void loadStockList() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.STOCKS_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.STOCKS_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {
@@ -314,7 +317,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
 
     private void deleteItem(String id) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.STOCKS_COLLECTION, id, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().deleteData(sharedPrefHelper.getAppName() + AppConstants.STOCKS_COLLECTION, id, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 Toast.makeText(context, "Stock Removed", Toast.LENGTH_LONG).show();
@@ -423,7 +426,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
                 stockModel.setQuantity(Integer.parseInt(qtyValue));
                 stockModel.setVendorModel(selectedVendor[0]);
 
-                InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.STOCKS_COLLECTION, stockModel.getId(), stockModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+                InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.STOCKS_COLLECTION, stockModel.getId(), stockModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                     @Override
                     public void onSuccess(Object orderId) {
                         dialog.dismiss();
@@ -484,7 +487,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
 
     private void loadVendorList() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.VENDOR_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.VENDOR_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {

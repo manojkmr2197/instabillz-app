@@ -13,7 +13,7 @@ public class AutoIndexHelper {
         if (e instanceof FirebaseFirestoreException) {
             FirebaseFirestoreException fex = (FirebaseFirestoreException) e;
             if(fex.getCode() == FirebaseFirestoreException.Code.FAILED_PRECONDITION){
-
+                System.out.println("MANO FIREBASE EXCEPTION----->"+fex.getMessage());
                 String url = extractIndexUrl(fex.getMessage());
                 if (url != null && !pendingIndexUrls.contains(url)) {
                     pendingIndexUrls.add(url);
@@ -27,9 +27,9 @@ public class AutoIndexHelper {
 
         System.out.println("INDEX----->"+message);
         int start = message.indexOf("https://");
-        int end = message.length()-1;
+        int end = message.length();
 
-        if (start != -1 && end != -1)
+        if (start != -1)
             return message.substring(start, end);
 
         return null;

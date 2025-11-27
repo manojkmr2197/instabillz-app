@@ -126,8 +126,8 @@ public class InstaFirebaseRepository {
                 });
     }
 
-    public void userLogin( String phone, String passcode,OnFirebaseWriteListener listener) {
-        db.collection(AppConstants.APP_NAME + AppConstants.EMPLOYEE_COLLECTION)
+    public void userLogin(String merchantName, String phone, String passcode,OnFirebaseWriteListener listener) {
+        db.collection(merchantName + AppConstants.EMPLOYEE_COLLECTION)
                 .whereEqualTo("phone", phone)
                 .whereEqualTo("passcode", passcode)
                 .get()
@@ -143,8 +143,8 @@ public class InstaFirebaseRepository {
                 });
     }
 
-    public void getLatestToken(OnFirebaseWriteListener listener) {
-        db.collection(AppConstants.APP_NAME + AppConstants.SALES_COLLECTION)
+    public void getLatestToken(String merchantName,OnFirebaseWriteListener listener) {
+        db.collection(merchantName + AppConstants.SALES_COLLECTION)
                 .orderBy("billingDate", Query.Direction.DESCENDING)
                 .limit(1) // 🔹 only take the latest one
                 .get()

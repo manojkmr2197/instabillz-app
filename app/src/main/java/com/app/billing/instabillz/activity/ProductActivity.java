@@ -41,6 +41,7 @@ import com.app.billing.instabillz.model.CategoryModel;
 import com.app.billing.instabillz.model.ProductModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.ReportGenerator;
+import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -63,6 +64,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
 
     Context context;
     Activity activity;
+    SharedPrefHelper sharedPrefHelper;
 
     LinearLayout layoutCategories;
     EditText productSearch;
@@ -91,6 +93,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
 
         context = ProductActivity.this;
         activity = ProductActivity.this;
+        sharedPrefHelper = new SharedPrefHelper(this);
 
         productSearch = (EditText) findViewById(R.id.product_etSearch);
         layoutCategories = findViewById(R.id.layoutCategories);
@@ -309,7 +312,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
             newProductModel.setPrice(Double.parseDouble(productPrice.getText().toString()));
             newProductModel.setCategoryName(categorySpinner.getSelectedItem().toString());
 
-            InstaFirebaseRepository.getInstance().addDataBase(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, newProductModel.getId(), newProductModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            InstaFirebaseRepository.getInstance().addDataBase(sharedPrefHelper.getAppName() + AppConstants.PRODUCTS_COLLECTION, newProductModel.getId(), newProductModel, new InstaFirebaseRepository.OnFirebaseWriteListener() {
                 @Override
                 public void onSuccess(Object orderId) {
                     Toast.makeText(context, "Products Updated", Toast.LENGTH_LONG).show();
@@ -332,7 +335,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
 
     private void deleteProductItem(String id) {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().deleteData(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, id, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().deleteData(sharedPrefHelper.getAppName() + AppConstants.PRODUCTS_COLLECTION, id, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 Toast.makeText(context, "Product Removed", Toast.LENGTH_LONG).show();
@@ -349,7 +352,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
 
     private void loadProductList() {
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.PRODUCTS_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.PRODUCTS_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 products.clear();
@@ -375,7 +378,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
     private void loadCategoryList() {
 
         Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
-        InstaFirebaseRepository.getInstance().getAllDetails(AppConstants.APP_NAME + AppConstants.CATEGORIES_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+        InstaFirebaseRepository.getInstance().getAllDetails(sharedPrefHelper.getAppName() + AppConstants.CATEGORIES_COLLECTION, "name", Query.Direction.ASCENDING, new InstaFirebaseRepository.OnFirebaseWriteListener() {
             @Override
             public void onSuccess(Object data) {
                 categoryModelList.clear();

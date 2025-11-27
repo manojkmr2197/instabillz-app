@@ -2,6 +2,7 @@ package com.app.billing.instabillz.activity;
 
 import static java.lang.Thread.sleep;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -29,7 +30,10 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.app.billing.instabillz.R;
 import com.app.billing.instabillz.constants.AppConstants;
+import com.app.billing.instabillz.model.AttendanceModel;
 import com.app.billing.instabillz.model.EmployeeModel;
+import com.app.billing.instabillz.model.ExpenseModel;
+import com.app.billing.instabillz.model.InvoiceModel;
 import com.app.billing.instabillz.model.ShopsModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.AutoIndexHelper;
@@ -88,7 +92,7 @@ public class OnboardingActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                askClosePopup();
             }
         });
 
@@ -130,6 +134,28 @@ public class OnboardingActivity extends AppCompatActivity {
         intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE);
     }
+
+    @SuppressLint("MissingSuperCall")
+    @Override
+    public void onBackPressed() {
+        askClosePopup();
+    }
+
+    private void askClosePopup() {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirm Exit")
+                .setMessage("Are you sure? This action cannot be undone.")
+                .setCancelable(false)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Exit the activity
+                    finish();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -445,11 +471,9 @@ public class OnboardingActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         showLoader();
         // Step 1: Create dummy documents
-        insertDummyDoc(db, id + AppConstants.EXPENSE_COLLECTION);
-        insertDummyDoc(db, id + AppConstants.ATTENDANCE_COLLECTION);
-        insertDummyDoc(db, id + AppConstants.SALES_COLLECTION);
+        //createDummyDocuments(id);
 
-        sleep(2000);
+        sleep(3000);
 
         runIndexTestQueries(id);
 
@@ -466,11 +490,49 @@ public class OnboardingActivity extends AppCompatActivity {
                 storeIndexUrls(id, urls);
                 AutoIndexHelper.clear();
                 // Step 4: Delete dummy docs
-                deleteAllDummyDocs(id);
+                //deleteAllDummyDocs(id);
 
             }
 
         }, 3000);
+
+    }
+
+    private void createDummyDocuments(String id) {
+        ExpenseModel expense = new ExpenseModel();
+        expense.setId(SingleTon.generateDummyDocument());
+        InstaFirebaseRepository.getInstance().addDataBase(id + AppConstants.EXPENSE_COLLECTION, expense.getId(), expense, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @Override
+            public void onSuccess(Object data) {}
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
+        AttendanceModel login_attendance = new AttendanceModel();
+        InstaFirebaseRepository.getInstance().addDataBase(id + AppConstants.ATTENDANCE_COLLECTION, SingleTon.generateDummyDocument(), login_attendance, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @Override
+            public void onSuccess(Object data) {}
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
+        InvoiceModel newInvoice =new InvoiceModel();
+        InstaFirebaseRepository.getInstance().addDataBase(id + AppConstants.SALES_COLLECTION, SingleTon.generateDummyDocument(), newInvoice, new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @Override
+            public void onSuccess(Object data) {}
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 

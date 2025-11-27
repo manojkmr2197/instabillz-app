@@ -78,6 +78,10 @@ public class ShopManagementActivity extends AppCompatActivity implements View.On
             public void click(int index, String type) {
                 if("EDIT".equalsIgnoreCase(type)){
                     //edit option
+                    Intent intent = new Intent(context, ShopProfileActivity.class);
+                    intent.putExtra("shop_id", shopsModelList.get(index).getId());
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 }else if("DELETE".equalsIgnoreCase(type)){
                     deleteConfirmation(index);
                 }
@@ -122,7 +126,7 @@ public class ShopManagementActivity extends AppCompatActivity implements View.On
         builder.setPositiveButton("Yes", (dialog, which) -> {
             dialog.dismiss();
             try {
-                deleteShopItem(index);
+                //deleteShopItem(index);
             } catch (Exception e) {
                 Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
             }
