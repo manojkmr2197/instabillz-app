@@ -175,7 +175,8 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Exception e) {
-
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -205,38 +206,6 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             });
         }
-    }
-
-
-    private void showSubscriptionErrorDialog() {
-        Dialog dialog = new Dialog(context);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_subscription_error);
-        dialog.setCancelable(false);
-
-        // Transparent background with rounded corners
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        TextView tvPhoneNumber = dialog.findViewById(R.id.tvPhoneNumber);
-        Button btnOk = dialog.findViewById(R.id.btnOk);
-
-        // Clickable phone number -> opens dialer
-        tvPhoneNumber.setOnClickListener(v -> {
-            String phone = tvPhoneNumber.getText().toString().trim();
-            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone));
-            startActivity(intent);
-        });
-
-        // OK button -> close app
-        btnOk.setOnClickListener(v -> {
-            dialog.dismiss();
-            finishAffinity(); // closes all activities
-            System.exit(0); // ensures app termination
-        });
-
-        dialog.show();
     }
 
 }

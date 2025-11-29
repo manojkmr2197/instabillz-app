@@ -471,7 +471,7 @@ public class OnboardingActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         showLoader();
         // Step 1: Create dummy documents
-        //createDummyDocuments(id);
+        createDummyDocuments(id);
 
         sleep(3000);
 

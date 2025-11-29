@@ -33,6 +33,8 @@ import com.app.billing.instabillz.model.ShopsModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -73,6 +75,9 @@ public class ShopProfileActivity extends AppCompatActivity implements View.OnCli
 
     ShopsModel shopsModel = null;
 
+    FirebaseFirestore db;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +96,7 @@ public class ShopProfileActivity extends AppCompatActivity implements View.OnCli
         context = ShopProfileActivity.this;
         activity = ShopProfileActivity.this;
         sharedPrefHelper = new SharedPrefHelper(context);
+        db = FirebaseFirestore.getInstance();
 
         back = findViewById(R.id.shop_profile_back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -150,8 +156,10 @@ public class ShopProfileActivity extends AppCompatActivity implements View.OnCli
         shopStatusRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.shop_profile_active_rb) {
                 shopsModel.setActive(true);     // active selected
+                subs_date_ll.setVisibility(View.VISIBLE);
             } else if (checkedId == R.id.shop_profile_inactive_rb) {
                 shopsModel.setActive(false);    // inactive selected
+                subs_date_ll.setVisibility(View.GONE);
             }
         });
 
@@ -252,11 +260,39 @@ public class ShopProfileActivity extends AppCompatActivity implements View.OnCli
             }
         } else if (view.getId() == R.id.shop_profile_pre_approved_btn) {
             shopsModel.setIndexUrls(new ArrayList<>());
+            clearCollection(shopsModel.getId()+ AppConstants.EXPENSE_COLLECTION);
+            clearCollection(shopsModel.getId()+ AppConstants.ATTENDANCE_COLLECTION);
+            clearCollection(shopsModel.getId()+ AppConstants.SALES_COLLECTION);
             updateShopDetails(shopsModel);
         } else if (view.getId() == R.id.shop_profile_pick_date_bt) {
             chooseDate();
         }
     }
+
+
+    public void clearCollection(String collectionPath) {
+        db.collection(collectionPath)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    WriteBatch batch = db.batch();
+
+                    for (DocumentSnapshot document : queryDocumentSnapshots) {
+                        batch.delete(document.getReference());
+                    }
+
+                    batch.commit()
+                            .addOnSuccessListener(aVoid -> {
+                                System.out.println("Firestore All documents deleted!");
+                            })
+                            .addOnFailureListener(e -> {
+                                System.out.println("Firestore Error deleting documents"+ e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    System.out.println("Firestore Error getting documents"+ e);
+                });
+    }
+
 
     private void chooseDate() {
 

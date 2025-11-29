@@ -1,5 +1,7 @@
 package com.app.billing.instabillz.activity;
 
+import static com.app.billing.instabillz.constants.AppConstants.*;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -30,9 +33,12 @@ import com.app.billing.instabillz.model.EmployeeModel;
 import com.app.billing.instabillz.model.ShopsModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -50,6 +56,8 @@ public class ShopManagementActivity extends AppCompatActivity implements View.On
     ShopMgmtViewAdapter adapter;
     List<ShopsModel> shopsModelList=new ArrayList<>();
 
+    FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +74,8 @@ public class ShopManagementActivity extends AppCompatActivity implements View.On
         }
         context = ShopManagementActivity.this;
         activity = ShopManagementActivity.this;
+        db = FirebaseFirestore.getInstance();
+
         back = (TextView) findViewById(R.id.shop_mgmt_back);
         back.setOnClickListener(this);
 
@@ -126,7 +136,7 @@ public class ShopManagementActivity extends AppCompatActivity implements View.On
         builder.setPositiveButton("Yes", (dialog, which) -> {
             dialog.dismiss();
             try {
-                //deleteShopItem(index);
+                deleteShopItem(index);
             } catch (Exception e) {
                 Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
             }
@@ -148,6 +158,8 @@ public class ShopManagementActivity extends AppCompatActivity implements View.On
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(Object data) {
+                deleteCollectionsByPrefix(shopsModelList.get(index).getId());
+                Toast.makeText(context, "Shop Deleted.!", Toast.LENGTH_LONG).show();
                 shopsModelList.remove(index);
                 adapter.notifyDataSetChanged();
             }
@@ -160,6 +172,36 @@ public class ShopManagementActivity extends AppCompatActivity implements View.On
         });
 
     }
+
+
+    public void deleteCollectionsByPrefix(String prefix) {
+        deleteAllDocuments(prefix+PRODUCTS_COLLECTION);
+        deleteAllDocuments(prefix+CATEGORIES_COLLECTION);
+        deleteAllDocuments(prefix+STOCKS_COLLECTION);
+        deleteAllDocuments(prefix+ATTENDANCE_COLLECTION);
+        deleteAllDocuments(prefix+EMPLOYEE_COLLECTION);
+        deleteAllDocuments(prefix+VENDOR_COLLECTION);
+        deleteAllDocuments(prefix+SALES_COLLECTION);
+        deleteAllDocuments(prefix+EXPENSE_COLLECTION);
+    }
+
+    private void deleteAllDocuments(String collectionName) {
+        db.collection(collectionName)
+                .get()
+                .addOnSuccessListener(query -> {
+
+                    WriteBatch batch = db.batch();
+
+                    for (DocumentSnapshot doc : query) {
+                        batch.delete(doc.getReference());
+                    }
+
+                    batch.commit().addOnSuccessListener(a -> {
+                        Log.d("Firestore", "Cleared: " + collectionName);
+                    });
+                });
+    }
+
 
 
     @Override
