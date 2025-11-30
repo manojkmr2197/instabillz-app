@@ -8,6 +8,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -238,15 +240,15 @@ public class InvoiceActivity extends AppCompatActivity {
         BillingClickListener clickListener = new BillingClickListener() {
             @Override
             public void click(int index, String type) {
-                if(type.equalsIgnoreCase("EDIT")){
+                if (type.equalsIgnoreCase("EDIT")) {
                     Intent intent = new Intent(context, InvoiceEditActivity.class);
                     intent.putExtra("invoice", new Gson().toJson(invoiceModelList.get(index))); // pass data as JSON
                     context.startActivity(intent);
-                }else if(type.equalsIgnoreCase("DELETE")){
+                } else if (type.equalsIgnoreCase("DELETE")) {
                     deleteConfirmationInvoice(index);
-                }else if(type.equalsIgnoreCase("PRINT")){
+                } else if (type.equalsIgnoreCase("PRINT")) {
                     generateHardCopyBill(invoiceModelList.get(index));
-                }else if(type.equalsIgnoreCase("SHARE")){
+                } else if (type.equalsIgnoreCase("SHARE")) {
                     showWhatsappDialog(invoiceModelList.get(index));
                 }
             }
@@ -266,7 +268,7 @@ public class InvoiceActivity extends AppCompatActivity {
             dateRangeSpinner.setSelection(dateRangeAdapter.getPosition("Today"));
             Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
             fetchInvoices(employeeName, "Today", selectedDate);
-        }else{
+        } else {
             filterLL.setVisibility(View.VISIBLE);
         }
 
@@ -391,7 +393,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
             Toast.makeText(context, "Printing.!", Toast.LENGTH_LONG).show();
             try {
-                bluetoothPrinterHelper.printSmallFontReceipt(billData,printerDataModel);
+                bluetoothPrinterHelper.printSmallFontReceipt(billData, printerDataModel);
 
             } catch (Exception e) {
                 Toast.makeText(context, "Printer not available. Please restart the printer.!", Toast.LENGTH_LONG).show();
@@ -414,7 +416,7 @@ public class InvoiceActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(employeeSpinner.getSelectedItem() != null && dateRangeSpinner.getSelectedItem() != null) {
+        if (employeeSpinner.getSelectedItem() != null && dateRangeSpinner.getSelectedItem() != null) {
             fetchInvoices(employeeSpinner.getSelectedItem().toString(), dateRangeSpinner.getSelectedItem().toString(), selectedDate);
         }
     }
@@ -423,7 +425,7 @@ public class InvoiceActivity extends AppCompatActivity {
         // Create and configure the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Confirmation");
-        builder.setMessage("Do you want to Delete the Invoice # "+invoiceModelList.get(index).getToken());
+        builder.setMessage("Do you want to Delete the Invoice # " + invoiceModelList.get(index).getToken());
         builder.setCancelable(true);
 
         // Set positive button
@@ -545,7 +547,7 @@ public class InvoiceActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
             if (invoiceModelList.isEmpty()) {
                 emptyLayout.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 emptyLayout.setVisibility(View.GONE);
             }
         }).addOnFailureListener(e -> {
@@ -575,7 +577,7 @@ public class InvoiceActivity extends AppCompatActivity {
                                 .collect(Collectors.toList())
                 );
                 employeeAdapter.notifyDataSetChanged();
-                if(StringUtils.isNotBlank(getIntent().getStringExtra("employee_name"))) {
+                if (StringUtils.isNotBlank(getIntent().getStringExtra("employee_name"))) {
                     employeeSpinner.setSelection(employeeAdapter.getPosition(getIntent().getStringExtra("employee_name")));
                 }
             }
@@ -599,7 +601,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
         whatsappNumber = dialog.findViewById(R.id.etMobile);
         TextView tokenTv = dialog.findViewById(R.id.tvTokenNo);
-        tokenTv.setText("Token # "+invoice.getToken());
+        tokenTv.setText("Token # " + invoice.getToken());
         ImageView btnPick = dialog.findViewById(R.id.btnPickContact);
         Button btnSend = dialog.findViewById(R.id.btnSend);
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
@@ -611,7 +613,7 @@ public class InvoiceActivity extends AppCompatActivity {
             if (!mobile.isEmpty() && mobile.length() == 10) {
                 generatePdfAndSend(invoice, mobile);
                 dialog.dismiss();
-            }else{
+            } else {
                 Toast.makeText(context, "Please enter a valid mobile number", Toast.LENGTH_SHORT).show();
             }
         });
@@ -644,33 +646,54 @@ public class InvoiceActivity extends AppCompatActivity {
         }
     }
 
+    private void sendInvoiceToWhatsApp(String phoneNumber, File pdfFile, String packageName) {
+        try {
+
+            // ✅ Get URI for File using FileProvider
+            Uri fileUri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", pdfFile);
+
+            // ✅ Create Intent
+            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+            //sendIntent.setType("*/*");  // For both text and file
+            sendIntent.setType("application/pdf");
+            sendIntent.setPackage(packageName);
+            sendIntent.putExtra("jid", phoneNumber + "@s.whatsapp.net"); // For direct message
+            sendIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            startActivity(sendIntent);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "WhatsApp not installed or error occurred", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void generatePdfAndSend(InvoiceModel invoice, String mobile) {
 
-        String fileName = pdfHelper.createPdfAndShare(invoice,sharedPrefHelper.getPrinterDetails(),sharedPrefHelper.getSystemUserName());
+        String fileName = pdfHelper.createPdfAndShare(invoice, sharedPrefHelper.getPrinterDetails(), sharedPrefHelper.getSystemUserName());
         // Share PDF
         File pdfFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
 
-        if (!isWhatsappInstalled(context)) {
-            Toast.makeText(context, "WhatsApp is not installed on this device.", Toast.LENGTH_LONG).show();
-            return;
+        String number = "91" + mobile;
+
+        String whatsapp = "com.whatsapp";
+        String whatsappBusiness = "com.whatsapp.w4b";
+
+        if (isAppInstalled(whatsapp)) {
+            sendInvoiceToWhatsApp(number, pdfFile, whatsapp);
+        } else if (isAppInstalled(whatsappBusiness)) {
+            sendInvoiceToWhatsApp(number, pdfFile, whatsappBusiness);
+        } else {
+            Toast.makeText(context, "No WhatsApp app installed!", Toast.LENGTH_LONG).show();
         }
 
-        Uri uri = FileProvider.getUriForFile(context, AppConstants.COM_APP_BILLING_INSTABILLZ_FILEPROVIDER, pdfFile);
-
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("application/pdf");
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.putExtra("jid", mobile + "@s.whatsapp.net"); // WhatsApp format
-        intent.setPackage("com.whatsapp");
-
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        startActivity(intent);
     }
 
-    private boolean isWhatsappInstalled(Context context) {
+    private boolean isAppInstalled(String packageName) {
         try {
-            context.getPackageManager().getPackageInfo("com.whatsapp", 0);
+            context.getPackageManager().getPackageInfo(packageName, 0);
             return true;
         } catch (PackageManager.NameNotFoundException e) {
             return false;
