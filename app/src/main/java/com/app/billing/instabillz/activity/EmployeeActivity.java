@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,7 @@ public class EmployeeActivity extends AppCompatActivity {
 
     TextView back;
     RecyclerView recyclerView;
+    LinearLayout emptyLayout;
     FloatingActionButton add_fab;
 
     Context context;
@@ -96,6 +98,8 @@ public class EmployeeActivity extends AppCompatActivity {
                 createNewEmployee(null);
             }
         });
+
+        emptyLayout = (LinearLayout) findViewById(R.id.emptyLayout);
 
         search = (EditText) findViewById(R.id.employee_etSearch);
 
@@ -202,6 +206,11 @@ public class EmployeeActivity extends AppCompatActivity {
                 }
                 filteredList.addAll(employees);
                 adapter.notifyDataSetChanged();
+                if (filteredList.isEmpty()) {
+                    emptyLayout.setVisibility(View.VISIBLE);
+                }else{
+                    emptyLayout.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -224,6 +233,11 @@ public class EmployeeActivity extends AppCompatActivity {
                     filteredList.add(item);
                 }
             }
+        }
+        if (filteredList.isEmpty()) {
+            emptyLayout.setVisibility(View.VISIBLE);
+        }else{
+            emptyLayout.setVisibility(View.GONE);
         }
         adapter.notifyDataSetChanged();
     }

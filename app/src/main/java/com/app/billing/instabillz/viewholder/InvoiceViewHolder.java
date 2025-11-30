@@ -15,7 +15,7 @@ public class InvoiceViewHolder extends RecyclerView.ViewHolder{
 
     public TextView tokenTv, dateTv, totalCostTv, sellingCostTv, parcelCostTv, paymentModeTv, toggleProductsTv;
     public LinearLayout productListLayout;
-    public ImageView editBtn, deleteBtn,printBtn;
+    public ImageView editBtn, deleteBtn,printBtn,shareBtn;
 
     public InvoiceViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -30,6 +30,7 @@ public class InvoiceViewHolder extends RecyclerView.ViewHolder{
         editBtn = itemView.findViewById(R.id.invoice_edit);
         deleteBtn = itemView.findViewById(R.id.invoice_delete);
         printBtn = itemView.findViewById(R.id.invoice_item_print);
+        shareBtn = itemView.findViewById(R.id.invoice_item_share);
     }
 
 

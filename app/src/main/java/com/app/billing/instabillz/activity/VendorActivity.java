@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +55,7 @@ public class VendorActivity extends AppCompatActivity {
     Activity activity;
 
     TextView back;
+    LinearLayout emptyLayout;
     RecyclerView recyclerView;
     FloatingActionButton add_fab;
 
@@ -107,6 +109,7 @@ public class VendorActivity extends AppCompatActivity {
                }
             }
         };
+        emptyLayout =  (LinearLayout) findViewById(R.id.emptyLayout);
         vendorModelList= new ArrayList<>();
         recyclerView = (RecyclerView) findViewById(R.id.vendor_recyclerView);
         adapter = new VendorViewAdapter(context,vendorModelList,clickListener);
@@ -265,6 +268,11 @@ public class VendorActivity extends AppCompatActivity {
                     vendorModelList.add(doc.toObject(VendorModel.class));
                 }
                 adapter.notifyDataSetChanged();
+                if(vendorModelList.isEmpty()){
+                    emptyLayout.setVisibility(View.VISIBLE);
+                }else{
+                    emptyLayout.setVisibility(View.GONE);
+                }
             }
 
             @Override

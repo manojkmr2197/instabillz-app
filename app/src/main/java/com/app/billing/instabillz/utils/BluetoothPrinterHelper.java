@@ -15,8 +15,12 @@ import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
 import com.dantsu.escposprinter.textparser.PrinterTextParserImg;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class BluetoothPrinterHelper {
@@ -42,50 +46,111 @@ public class BluetoothPrinterHelper {
 
             EscPosPrinter printer = new EscPosPrinter(printerConnection, 203, 72f, 48);
 
-            // Heavy operations moved to background
-            Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.client_logo);
+            Bitmap logo = ImageLoader.getBrandLogoBitmap(context);
             String dateStr = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault()).format(new Date());
+
             int lineWidth = 48;
             String separator = new String(new char[lineWidth]).replace('\0', '-');
-            String star_separator = new String(new char[lineWidth]).replace('\0', '*');
+            String starSeparator = new String(new char[lineWidth]).replace('\0', '*');
 
+            // ---- COLUMN WIDTHS ---- //
+            // PRODUCT | UNIT | QTY | TOTAL  → total 48 chars
+            int COL_PRODUCT = 20;
+            int COL_UNIT = 8;
+            int COL_QTY = 6;
+            int COL_TOTAL = 10;
+
+
+            // ---- BUILD PRODUCT TABLE ---- //
             StringBuilder productLines = new StringBuilder();
+
             for (ProductModel p : billData.getProductModelList()) {
-                String name = (p.getName().length() > 20 ? p.getName().substring(0, 20) : p.getName());
-                String qty = " x " + p.getQty();
-                String price = "Rs." + String.format("%.2f", (p.getQty() * p.getPrice()));
-                productLines.append(String.format("[L]%-24s %8s %12s\n", name, qty, price));
+
+                String product = p.getName().toUpperCase();
+                String unit = "₹" + String.format("%.2f", p.getPrice());
+                String qty = String.valueOf(p.getQty());
+                String total = "₹" + String.format("%.2f", p.getPrice() * p.getQty());
+
+                List<String> lines = wrapText(product, COL_PRODUCT);
+
+                // First line → full row
+                productLines.append(
+                        "[L]"
+                                + padRight(lines.get(0), COL_PRODUCT)
+                                + padLeft(unit, COL_UNIT)
+                                + padLeft(qty, COL_QTY)
+                                + padLeft(total, COL_TOTAL)
+                                + "\n"
+                );
+
+                // Next lines (only product name)
+                for (int i = 1; i < lines.size(); i++) {
+                    productLines.append(
+                            "[L]"
+                                    + padRight(lines.get(i), COL_PRODUCT)
+                                    + padLeft("", COL_UNIT)
+                                    + padLeft("", COL_QTY)
+                                    + padLeft("", COL_TOTAL)
+                                    + "\n"
+                    );
+                }
             }
 
+            // ---- FINAL RECEIPT ---- //
             StringBuilder receipt = new StringBuilder();
-            receipt.append("[C]<img>").append(PrinterTextParserImg.bitmapToHexadecimalString(printer, logo)).append("</img>\n");
-            receipt.append("[C]<b>"+printerDataModel.getShopName().toUpperCase()+"</b>\n\n");
-            receipt.append("[C]<font name='b'>+"+printerDataModel.getHeader1()+"</font>\n");
-            receipt.append("[C]<font name='b'>+"+printerDataModel.getHeader2()+"</font>\n");
-            receipt.append("[C]<font name='b'>+"+printerDataModel.getHeader3()+"</font>\n");
-            receipt.append("[R]Date: ").append(dateStr.toUpperCase()).append("\n\n");
-            receipt.append("[L]<u><b>Token No: ").append(billData.getToken()).append("</b></u>\n");
-            receipt.append("[L]<b>Bill by: </b>").append(billData.getEmployeeName().toUpperCase()).append("\n");
+
+            receipt.append("[C]<img>")
+                    .append(PrinterTextParserImg.bitmapToHexadecimalString(printer, logo))
+                    .append("</img>\n");
+
+            receipt.append("[C]<b>").append(printerDataModel.getShopName().toUpperCase()).append("</b>\n");
+
+            if (StringUtils.isNotBlank(printerDataModel.getHeader1()))
+                receipt.append("[C]").append(printerDataModel.getHeader1()).append("\n");
+            if (StringUtils.isNotBlank(printerDataModel.getHeader2()))
+                receipt.append("[C]").append(printerDataModel.getHeader2()).append("\n");
+            if (StringUtils.isNotBlank(printerDataModel.getHeader3()))
+                receipt.append("[C]").append(printerDataModel.getHeader3()).append("\n");
+
+            receipt.append("[R]DATE: ").append(dateStr.toUpperCase()).append("\n");
             receipt.append("[L]").append(separator).append("\n");
-            receipt.append(String.format("[L]%-24s %8s %12s\n", "PRODUCT", "QTY", "PRICE"));
+
+            // ---- TABLE HEADER ---- //
+            receipt.append(
+                    "[L]"
+                            + padRight("PRODUCT", COL_PRODUCT)
+                            + padLeft("UNIT", COL_UNIT)
+                            + padLeft("QTY", COL_QTY)
+                            + padLeft("TOTAL", COL_TOTAL)
+                            + "\n"
+            );
             receipt.append("[L]").append(separator).append("\n");
+
+            // ---- PRODUCT ROWS ---- //
             receipt.append(productLines.toString());
             receipt.append("[L]").append(separator).append("\n");
 
+            // ---- TOTALS ---- //
             if (billData.getParcelCost() > 0) {
-                receipt.append("[C]<b>Bill Amount:[R]").append("Rs.").append(String.format("%.2f", billData.getTotalCost())).append("  </b>\n");
-                receipt.append("[C]<b>Parcel Charges:[R]").append(String.format("%.1f", billData.getParcelCost())).append("%  </b>\n");
+                receipt.append("[L]Parcel Charges: ₹").append(billData.getParcelCost()).append("\n");
             }
 
-            receipt.append("[C]<b><font size='big'>Total:[R]").append("<u>Rs.").append(String.format("%.2f", billData.getSellingCost())).append("</u></font></b>  \n\n");
-            receipt.append("[L]Payment: ").append(billData.getPaymentMode()).append("\n");
-            receipt.append("[L]").append(star_separator).append("\n");
-            receipt.append("[C]"+printerDataModel.getFooter1()+"\n");
-            receipt.append("[C]"+printerDataModel.getFooter2()+"\n");
-            receipt.append("[L]").append(star_separator).append("\n");
-            receipt.append("[C]"+printerDataModel.getFooter3()+"\n");
-            receipt.append("[L]").append(star_separator).append("\n");
+            receipt.append("[C]<b>Total: ₹").append(String.format("%.2f", billData.getSellingCost())).append("</b>\n");
+            receipt.append("[L]Payment: ").append(billData.getPaymentMode()).append("\n\n");
 
+            receipt.append("[L]").append(starSeparator).append("\n");
+            if (StringUtils.isNotBlank(printerDataModel.getFooter1()))
+                receipt.append("[C]").append(printerDataModel.getFooter1()).append("\n");
+            if (StringUtils.isNotBlank(printerDataModel.getFooter2()))
+                receipt.append("[C]").append(printerDataModel.getFooter2()).append("\n");
+            if (StringUtils.isNotBlank(printerDataModel.getFooter3()))
+                receipt.append("[C]").append(printerDataModel.getFooter3()).append("\n");
+
+            receipt.append("[C]").append("*Software - Instabillz [9585905176]*").append("\n");
+
+            receipt.append("[L]").append(starSeparator).append("\n");
+
+            // ---- PRINT ---- //
             printer.printFormattedTextAndCut(receipt.toString());
 
             //printingDialog.dismiss();
@@ -97,6 +162,28 @@ public class BluetoothPrinterHelper {
             Toast.makeText(context, "Printing Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    // ---- FORMAT HELPERS ---- //
+    String padRight(String s, int n) {
+        if (s.length() > n) return s.substring(0, n);
+        return String.format("%-" + n + "s", s);
+    }
+
+    String padLeft(String s, int n) {
+        if (s.length() > n) return s.substring(0, n);
+        return String.format("%" + n + "s", s);
+    }
+
+    // ---- MULTILINE WRAP FOR PRODUCT NAME ---- //
+    List<String> wrapText(String text, int width) {
+        List<String> lines = new ArrayList<>();
+        while (text.length() > width) {
+            lines.add(text.substring(0, width));
+            text = text.substring(width);
+        }
+        lines.add(text);
+        return lines;
     }
 
 

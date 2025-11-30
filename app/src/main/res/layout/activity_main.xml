@@ -34,7 +34,6 @@
         android:id="@+id/clientLogo"
         android:layout_width="160dp"
         android:layout_height="160dp"
-        android:src="@drawable/client_logo"
         android:alpha="0"
         android:layout_marginTop="10dp"
         android:layout_gravity="center" />

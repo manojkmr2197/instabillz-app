@@ -5,8 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/page_bg"
+    android:orientation="vertical"
     tools:context=".activity.StockActivity">
 
 
@@ -77,14 +77,55 @@
                 android:singleLine="true"
                 android:textSize="16sp" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/stock_recyclerView"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="always" />
+                android:layout_height="match_parent">
+                <!-- Empty Layout -->
+                <LinearLayout
+                    android:id="@+id/emptyLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/imgEmpty"
+                        android:layout_width="160dp"
+                        android:layout_height="160dp"
+                        android:alpha="0.9"
+                        android:src="@drawable/ic_empty_box" />
+
+                    <TextView
+                        android:id="@+id/tvEmptyTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="No Data Found"
+                        android:textColor="#333"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvEmptyMsg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Looks empty here. Please check again later!"
+                        android:textAlignment="center"
+                        android:textColor="#777"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/stock_recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="always" />
+            </FrameLayout>
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -5,19 +5,29 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.ContactsContract;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -29,6 +39,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,6 +52,7 @@ import com.app.billing.instabillz.model.InvoiceModel;
 import com.app.billing.instabillz.model.ShopsModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.BluetoothPrinterHelper;
+import com.app.billing.instabillz.utils.PDFHelper;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -50,6 +62,7 @@ import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -76,6 +89,7 @@ public class InvoiceActivity extends AppCompatActivity {
     ArrayAdapter<String> employeeAdapter;
     ArrayAdapter<CharSequence> dateRangeAdapter;
 
+    LinearLayout emptyLayout;
     RecyclerView recyclerView;
     FirebaseFirestore db;
     SharedPrefHelper sharedPrefHelper;
@@ -89,6 +103,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
     ZoneOffset istOffset = ZoneOffset.ofHoursMinutes(5, 30);
 
+    EditText whatsappNumber;
 
     BluetoothAdapter bluetoothAdapter;
     public BluetoothPrinterHelper bluetoothPrinterHelper;
@@ -100,6 +115,9 @@ public class InvoiceActivity extends AppCompatActivity {
     private static final int PERMISSION_BLUETOOTH_ADMIN = 2;
     private static final int PERMISSION_BLUETOOTH_CONNECT = 3;
     private static final int PERMISSION_BLUETOOTH_SCAN = 4;
+
+    private static final int PICK_CONTACT = 101;
+    PDFHelper pdfHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +139,7 @@ public class InvoiceActivity extends AppCompatActivity {
         sharedPrefHelper = new SharedPrefHelper(context);
         bluetoothPrinterHelper = new BluetoothPrinterHelper(context, activity);
         printerDataModel = sharedPrefHelper.getPrinterDetails();
+        pdfHelper = new PDFHelper(context);
 
         back = (TextView) findViewById(R.id.invoice_back);
         back.setOnClickListener(v -> {
@@ -227,6 +246,8 @@ public class InvoiceActivity extends AppCompatActivity {
                     deleteConfirmationInvoice(index);
                 }else if(type.equalsIgnoreCase("PRINT")){
                     generateHardCopyBill(invoiceModelList.get(index));
+                }else if(type.equalsIgnoreCase("SHARE")){
+                    showWhatsappDialog(invoiceModelList.get(index));
                 }
             }
         };
@@ -235,6 +256,7 @@ public class InvoiceActivity extends AppCompatActivity {
         adapter = new InvoiceViewAdapter(context, invoiceModelList, clickListener);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);
+        emptyLayout = (LinearLayout) findViewById(R.id.emptyLayout);
 
         Intent intent = getIntent();
         String employeeName = intent.getStringExtra("employee_name");
@@ -521,6 +543,11 @@ public class InvoiceActivity extends AppCompatActivity {
                 invoiceModelList.add(invoice);
             }
             adapter.notifyDataSetChanged();
+            if (invoiceModelList.isEmpty()) {
+                emptyLayout.setVisibility(View.VISIBLE);
+            }else{
+                emptyLayout.setVisibility(View.GONE);
+            }
         }).addOnFailureListener(e -> {
             e.printStackTrace();
             Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
@@ -560,4 +587,95 @@ public class InvoiceActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void showWhatsappDialog(InvoiceModel invoice) {
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_invoice_whatsapp_share);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.BottomDialogAnimation;
+
+        whatsappNumber = dialog.findViewById(R.id.etMobile);
+        TextView tokenTv = dialog.findViewById(R.id.tvTokenNo);
+        tokenTv.setText("Token # "+invoice.getToken());
+        ImageView btnPick = dialog.findViewById(R.id.btnPickContact);
+        Button btnSend = dialog.findViewById(R.id.btnSend);
+        Button btnCancel = dialog.findViewById(R.id.btnCancel);
+
+        btnPick.setOnClickListener(v -> pickContact());
+
+        btnSend.setOnClickListener(v -> {
+            String mobile = whatsappNumber.getText().toString().trim();
+            if (!mobile.isEmpty() && mobile.length() == 10) {
+                generatePdfAndSend(invoice, mobile);
+                dialog.dismiss();
+            }else{
+                Toast.makeText(context, "Please enter a valid mobile number", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void pickContact() {
+        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        startActivityForResult(intent, PICK_CONTACT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_CONTACT && resultCode == RESULT_OK) {
+            Uri contactUri = data.getData();
+            Cursor cursor = getContentResolver().query(contactUri,
+                    null, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                String number = cursor.getString(numberIndex);
+
+                whatsappNumber.setText(number.replace(" ", ""));
+                cursor.close();
+            }
+        }
+    }
+
+    private void generatePdfAndSend(InvoiceModel invoice, String mobile) {
+
+        String fileName = pdfHelper.createPdfAndShare(invoice,sharedPrefHelper.getPrinterDetails(),sharedPrefHelper.getSystemUserName());
+        // Share PDF
+        File pdfFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
+
+        if (!isWhatsappInstalled(context)) {
+            Toast.makeText(context, "WhatsApp is not installed on this device.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Uri uri = FileProvider.getUriForFile(context, AppConstants.COM_APP_BILLING_INSTABILLZ_FILEPROVIDER, pdfFile);
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("application/pdf");
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.putExtra("jid", mobile + "@s.whatsapp.net"); // WhatsApp format
+        intent.setPackage("com.whatsapp");
+
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        startActivity(intent);
+    }
+
+    private boolean isWhatsappInstalled(Context context) {
+        try {
+            context.getPackageManager().getPackageInfo("com.whatsapp", 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
+
 }

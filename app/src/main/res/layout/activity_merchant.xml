@@ -55,6 +55,7 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
+            android:layout_marginEnd="3dp"
             android:text="🤝 Integration Request — Reach Our Team"
             android:textColor="@color/app_color"
             android:textSize="11sp" />
@@ -67,13 +68,14 @@
             android:contentDescription="WhatsApp"
             android:focusable="true"
             android:padding="3dp"
+            android:layout_marginEnd="3dp"
             android:backgroundTint="@color/app_color"
             android:src="@drawable/baseline_call_24" />
 
         <ImageView
             android:id="@+id/btnWhatsApp"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:clickable="true"
             android:contentDescription="WhatsApp"
             android:focusable="true"

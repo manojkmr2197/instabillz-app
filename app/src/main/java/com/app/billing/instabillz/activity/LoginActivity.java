@@ -27,14 +27,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.app.billing.instabillz.R;
+import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.model.EmployeeModel;
+import com.app.billing.instabillz.model.ShopsModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
+import com.app.billing.instabillz.utils.ImageLoader;
 import com.app.billing.instabillz.utils.MoveNextWatcher;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -75,6 +82,8 @@ public class LoginActivity extends AppCompatActivity {
         ImageView logo1 = findViewById(R.id.login_app_logo);
         ImageView logo2 = findViewById(R.id.login_partnership);
         ImageView logo3 = findViewById(R.id.login_client_logo);
+
+        ImageLoader.loadBrandLogo(context,logo3);
 
         Animation popAnim = AnimationUtils.loadAnimation(this, R.anim.logo_pop);
 
@@ -117,9 +126,49 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        btnLogin.setOnClickListener(v -> handleLogin());
+        btnLogin.setOnClickListener(v -> validateMerchant());
         tvDifferentUser.setOnClickListener(v -> clearSharedPref());
 
+    }
+
+    private void validateMerchant() {
+        Toast.makeText(context, "Loading.!", Toast.LENGTH_SHORT).show();
+        InstaFirebaseRepository.getInstance().getDetailsByDocumentId(AppConstants.SHOP_COLLECTION, sharedPrefHelper.getAppName(), new InstaFirebaseRepository.OnFirebaseWriteListener() {
+            @Override
+            public void onSuccess(Object data) {
+                DocumentSnapshot doc = (DocumentSnapshot) data;
+                if (doc.exists()) {
+                    ShopsModel printerDataModel = doc.toObject(ShopsModel.class);
+
+                    if (printerDataModel != null && printerDataModel.isActive()) {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        LocalDate subscriptionDate = LocalDate.parse(printerDataModel.getSubscriptionDate(), formatter);
+                        LocalDate today = LocalDate.now();
+
+                        // ✅ Allow only if today is on or before subscription date
+                        if (!today.isAfter(subscriptionDate)) {
+                            // Subscription still valid
+                            sharedPrefHelper.setPrinterDetails(printerDataModel);
+                            handleLogin();
+                        } else {
+                            // Subscription expired
+                            showSubscriptionErrorDialog();
+                        }
+
+                    } else {
+                        showSubscriptionErrorDialog();
+                    }
+                }else{
+                    Toast.makeText(context, "No Merchant Information Found.!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void handleLogin() {
@@ -138,6 +187,37 @@ public class LoginActivity extends AppCompatActivity {
 
         validateUser(phone, passcode);
 
+    }
+
+    private void showSubscriptionErrorDialog() {
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_subscription_error);
+        dialog.setCancelable(false);
+
+        // Transparent background with rounded corners
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        TextView tvPhoneNumber = dialog.findViewById(R.id.tvPhoneNumber);
+        Button btnOk = dialog.findViewById(R.id.btnOk);
+
+        // Clickable phone number -> opens dialer
+        tvPhoneNumber.setOnClickListener(v -> {
+            String phone = tvPhoneNumber.getText().toString().trim();
+            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone));
+            startActivity(intent);
+        });
+
+        // OK button -> close app
+        btnOk.setOnClickListener(v -> {
+            dialog.dismiss();
+            finishAffinity(); // closes all activities
+            System.exit(0); // ensures app termination
+        });
+
+        dialog.show();
     }
 
     private void validateUser(String phone, String passcode) {

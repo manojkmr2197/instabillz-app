@@ -5,8 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/page_bg"
+    android:orientation="vertical"
     tools:context=".activity.EmployeeReportActivity">
 
     <!-- Heading -->
@@ -46,16 +46,15 @@
         </LinearLayout>
 
 
-
-
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/attendance_report_filter_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10sp"
-        android:id="@+id/attendance_report_filter_ll"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,42 +65,83 @@
                 android:id="@+id/attendance_report_employees_spinner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="5dp"
-                android:textAlignment="center"
                 android:layout_marginEnd="5dp"
-                android:background="@drawable/spinner_bg" />
+                android:layout_weight="1"
+                android:background="@drawable/spinner_bg"
+                android:padding="5dp"
+                android:textAlignment="center" />
 
             <Spinner
                 android:id="@+id/attendance_report_date_range"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textAlignment="center"
+                android:background="@drawable/spinner_bg"
                 android:padding="5dp"
-                android:background="@drawable/spinner_bg" />
+                android:textAlignment="center" />
 
         </LinearLayout>
 
         <Button
             android:id="@+id/attendance_report_search"
             android:layout_width="200sp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:backgroundTint="@color/app_color"
             android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:text="Search Report" />
+            android:layout_gravity="center"
+            android:backgroundTint="@color/app_color"
+            android:gravity="center"
+            android:text="Search Report"
+            android:textSize="13sp" />
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/attendance_report_recyclerView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="5dp"
-        android:layout_weight="1"
-        android:nestedScrollingEnabled="false"
-        android:overScrollMode="always" />
+        android:layout_height="match_parent">
+        <!-- Empty Layout -->
+        <LinearLayout
+            android:id="@+id/emptyLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imgEmpty"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:alpha="0.9"
+                android:src="@drawable/ic_empty_box" />
+
+            <TextView
+                android:id="@+id/tvEmptyTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="No Data Found"
+                android:textColor="#333"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEmptyMsg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Looks empty here. Please check again later!"
+                android:textAlignment="center"
+                android:textColor="#777"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/attendance_report_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="always" />
+    </FrameLayout>
 
 </LinearLayout>

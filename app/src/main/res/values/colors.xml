@@ -8,4 +8,31 @@
     <color name="teal_700">#00796B</color>
     <color name="status_bar_color">#DDE3FA</color>
 
+    <!-- Brand Primary Colors -->
+    <color name="primary_blue">#205C9B</color>          <!-- Main App Color -->
+    <color name="primary_blue_light">#4FA6E2</color>    <!-- Light Variant -->
+
+    <!-- Secondary Colors (Professional Teal Palette) -->
+    <color name="secondary_teal">#1C7C78</color>        <!-- Accent Color -->
+    <color name="secondary_teal_light">#4DC7C0</color>  <!-- Accent Light -->
+
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_on_secondary">#FFFFFF</color>
+
+    <!-- Backgrounds -->
+    <color name="app_background">#F5F7FA</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- Outline / Borders -->
+    <color name="border_light">#DDDDDD</color>
+
+    <!-- Status / Messages -->
+    <color name="success_green">#4CAF50</color>
+    <color name="error_red">#F44336</color>
+    <color name="warning_orange">#FFC107</color>
+    <color name="info_blue">#2196F3</color>
+
 </resources>

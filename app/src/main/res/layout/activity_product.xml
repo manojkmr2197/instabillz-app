@@ -110,6 +110,15 @@
             android:layout_marginBottom="16dp"
             android:src="@drawable/ic_baseline_add_24" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/product_bulk_add_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="80dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/baseline_bulk_add" />
+
     </FrameLayout>
 
 </LinearLayout>

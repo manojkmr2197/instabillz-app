@@ -61,6 +61,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
     TextView back, download;
     RecyclerView recyclerView;
     FloatingActionButton add_fab;
+    LinearLayout emptyLayout;
 
     Context context;
     Activity activity;
@@ -97,6 +98,7 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
         back.setOnClickListener(this);
         download = (TextView) findViewById(R.id.stock_download);
 
+        emptyLayout = (LinearLayout) findViewById(R.id.emptyLayout);
         stockSearch = (EditText) findViewById(R.id.stock_etSearch);
         add_fab = (FloatingActionButton) findViewById(R.id.stock_add_fab);
 
@@ -260,6 +262,11 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
                 }
                 filteredList.addAll(stocks);
                 adapter.notifyDataSetChanged();
+                if(filteredList.isEmpty()){
+                    emptyLayout.setVisibility(View.VISIBLE);
+                }else {
+                    emptyLayout.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -282,6 +289,11 @@ public class StockActivity extends AppCompatActivity implements View.OnClickList
                     filteredList.add(item);
                 }
             }
+        }
+        if(filteredList.isEmpty()){
+            emptyLayout.setVisibility(View.VISIBLE);
+        }else {
+            emptyLayout.setVisibility(View.GONE);
         }
         adapter.notifyDataSetChanged();
     }

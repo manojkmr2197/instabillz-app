@@ -4,6 +4,13 @@ public class CategoryModel {
     private String id;
     private String name;
 
+    public CategoryModel() {
+    }
+
+    public CategoryModel(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public String getId() {
         return id;

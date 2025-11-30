@@ -18,6 +18,12 @@ public class ProductModel {
         this.price = price;
     }
 
+    public ProductModel(String name, Double price,String categoryName) {
+        this.name = name;
+        this.price = price;
+        this.categoryName = categoryName;
+    }
+
     public String getId() {
         return id;
     }

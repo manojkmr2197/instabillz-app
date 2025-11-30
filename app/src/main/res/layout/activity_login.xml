@@ -46,8 +46,8 @@
                 <!-- App Logo -->
                 <ImageView
                     android:id="@+id/login_app_logo"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:src="@drawable/app_image" />
                 <!-- App Logo -->
                 <ImageView
@@ -59,9 +59,8 @@
                 <!-- App Logo -->
                 <ImageView
                     android:id="@+id/login_client_logo"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/client_logo" />
+                    android:layout_width="80dp"
+                    android:layout_height="80dp" />
             </LinearLayout>
 
             <!-- Phone Number -->

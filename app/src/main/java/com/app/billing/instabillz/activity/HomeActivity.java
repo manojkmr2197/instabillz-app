@@ -30,6 +30,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Size;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -83,6 +84,7 @@ import com.app.billing.instabillz.utils.ApiClient;
 import com.app.billing.instabillz.utils.BluetoothPrinterHelper;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -150,6 +152,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private boolean isCameraRunning = false;
     private Button btnToggleCamera;
 
+    boolean isBluetoothPrinter = false;
 
     SharedPrefHelper sharedPrefHelper;
 
@@ -495,6 +498,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         if (bluetoothAdapter.isEnabled()) {
             //Toast.makeText(this, "Bluetooth is already enabled", Toast.LENGTH_SHORT).show();
+            checkPrinterStatus();
             return;
         }
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
@@ -524,6 +528,78 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
     }
+
+    private void checkPrinterStatus() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_BLUETOOTH);
+                return;
+            } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_ADMIN}, PERMISSION_BLUETOOTH_ADMIN);
+                return;
+            } else {
+                // Your Bluetooth logic here
+            }
+        } else {
+            // For Android 12 (S) and above
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, PERMISSION_BLUETOOTH_CONNECT);
+                return;
+            } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, PERMISSION_BLUETOOTH_SCAN);
+                return;
+            } else {
+                // Your Bluetooth logic here
+            }
+        }
+
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+
+        if (!pairedDevices.isEmpty()) {
+            boolean state = false;
+            for (BluetoothDevice device : pairedDevices) {
+                if (device.getName().contains(shopsModel.getPrinterName()) && !state) {
+                    Toast.makeText(context, "Printer connected Successfully.!", Toast.LENGTH_SHORT).show();
+                    isBluetoothPrinter = true;
+                    state = true;
+                }
+            }
+            if (!state) {
+                isBluetoothPrinter = false;
+                //Toast.makeText(context, "Printer not connected properly.!", Toast.LENGTH_LONG).show();
+                showPrinterInfoDialog();
+            }
+        } else {
+            isBluetoothPrinter = false;
+            showPrinterInfoDialog();
+            //Toast.makeText(context, "No paired devices found", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showPrinterInfoDialog() {
+
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_printing_not_available, null);
+
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(view)
+                .setCancelable(false)
+                .create();
+
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        Button btnRetry = view.findViewById(R.id.btnRetry);
+        Button btnClose = view.findViewById(R.id.btnClose);
+
+        btnRetry.setOnClickListener(v -> {
+            dialog.dismiss();
+            checkPrinterStatus(); // retry logic
+        });
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -658,6 +734,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }
+        total[0] = roundOfValue(total[0]);
 
         if (sb.length() > 0) {
             Dialog dialog = new Dialog(this);
@@ -698,6 +775,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             Button btnCheckoutPrint = sheetView.findViewById(R.id.btnCheckoutPrint);
             EditText parcelAmount = sheetView.findViewById(R.id.bill_parcel_amount);
 
+            if (isBluetoothPrinter) {
+                btnCheckoutPrint.setClickable(true);
+                btnCheckoutPrint.setAlpha(1f);
+            }else{
+                btnCheckoutPrint.setClickable(false);
+                btnCheckoutPrint.setAlpha(0.5f);
+            }
+
             RadioGroup paymentGroup = (RadioGroup) sheetView.findViewById(R.id.new_bill_payment_radio_group);
             RadioButton cashRadioBt = (RadioButton) sheetView.findViewById(R.id.new_billing_payment_cash);
             RadioButton upiRadioBt = (RadioButton) sheetView.findViewById(R.id.new_billing_payment_upi);
@@ -736,7 +821,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     } else {
                         parcelAmountValue[0] = Double.parseDouble(s.toString());
                     }
-                    cartTotal.setText("Total: ₹" + (total[0] + parcelAmountValue[0]));
+                    cartTotal.setText("Total: ₹" + roundOfValue(total[0] + parcelAmountValue[0]));
                 }
             });
             InvoiceModel newInvoice = new InvoiceModel();
@@ -751,9 +836,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             btnCheckoutSave.setOnClickListener(b -> {
                 newInvoice.setPaymentMode(paymentMode[0]);
                 newInvoice.setUpiPaymentStatus("SUCCESS");
-                newInvoice.setParcelCost(parcelAmountValue[0]);
-                newInvoice.setTotalCost(total[0]);
-                newInvoice.setSellingCost(total[0] + parcelAmountValue[0]);
+                newInvoice.setParcelCost(roundOfValue(parcelAmountValue[0]));
+                newInvoice.setTotalCost(roundOfValue(total[0]));
+                newInvoice.setSellingCost(roundOfValue(total[0] + parcelAmountValue[0]));
                 newInvoice.setProductModelList(billItems);
                 SingleTon.hideKeyboard(context, activity);
                 saveNewBill(newInvoice, false);
@@ -765,11 +850,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     Toast.makeText(this, "Printer data not loaded", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if(!isBluetoothPrinter){
+                    return;
+                }
                 newInvoice.setPaymentMode(paymentMode[0]);
                 newInvoice.setUpiPaymentStatus("SUCCESS");
-                newInvoice.setParcelCost(parcelAmountValue[0]);
-                newInvoice.setTotalCost(total[0]);
-                newInvoice.setSellingCost(total[0] + parcelAmountValue[0]);
+                newInvoice.setParcelCost(roundOfValue(parcelAmountValue[0]));
+                newInvoice.setTotalCost(roundOfValue(total[0]));
+                newInvoice.setSellingCost(roundOfValue(total[0] + parcelAmountValue[0]));
                 newInvoice.setProductModelList(billItems);
                 SingleTon.hideKeyboard(context, activity);
                 saveNewBill(newInvoice, true);
@@ -874,10 +962,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
                 if (!state) {
-                    Toast.makeText(context, "Printer not connected properly.!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Printer not connected properly.!", Toast.LENGTH_LONG).show();
+                    loadProductList();
                 }
             } else {
-                Toast.makeText(context, "No paired devices found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "No paired devices found", Toast.LENGTH_LONG).show();
+                loadProductList();
             }
         }
 
@@ -916,6 +1006,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    public double roundOfValue(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
+
     private void showCartPreview() {
 
         StringBuilder sb = new StringBuilder();
@@ -946,6 +1041,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }
+
+        total = roundOfValue(total);
 
         if (sb.length() > 0) {
             Dialog dialog = new Dialog(this);

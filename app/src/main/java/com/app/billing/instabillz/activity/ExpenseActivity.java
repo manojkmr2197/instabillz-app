@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +61,7 @@ public class ExpenseActivity extends AppCompatActivity {
     SharedPrefHelper sharedPrefHelper;
 
     TextView back;
+    LinearLayout emptyLayout;
     RecyclerView recyclerView;
     FloatingActionButton add_fab;
 
@@ -121,6 +123,7 @@ public class ExpenseActivity extends AppCompatActivity {
             }
         };
 
+        emptyLayout = (LinearLayout)findViewById(R.id.emptyLayout);
         expenseModelList = new ArrayList<>();
         recyclerView = (RecyclerView) findViewById(R.id.expense_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -294,11 +297,14 @@ public class ExpenseActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                     // 🔹 Update RecyclerView or show message
                     if (expenseModelList.isEmpty()) {
-                        Toast.makeText(this, "No Expense records found.", Toast.LENGTH_SHORT).show();
+                        emptyLayout.setVisibility(View.VISIBLE);
+                    }else{
+                        emptyLayout.setVisibility(View.GONE);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                    Toast.makeText(context, "Firebase Internal Server Error.!", Toast.LENGTH_LONG).show();
                 });
     }
 

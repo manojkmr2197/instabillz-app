@@ -138,6 +138,15 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/baseline_print_active24" />
 
+            <ImageView
+                android:id="@+id/invoice_item_share"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:layout_marginStart="10sp"
+                android:src="@drawable/ic_whatsapp" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"

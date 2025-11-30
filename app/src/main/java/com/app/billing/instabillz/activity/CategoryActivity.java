@@ -15,6 +15,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +54,8 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
     CategoryViewAdapter adapter;
     BillingClickListener listener;
 
+    LinearLayout emptyLayout;
+
     SharedPrefHelper sharedPrefHelper;
 
     @Override
@@ -73,6 +76,8 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         context = CategoryActivity.this;
         activity = CategoryActivity.this;
         sharedPrefHelper = new SharedPrefHelper(this);
+
+        emptyLayout = (LinearLayout)findViewById(R.id.emptyLayout);
         recyclerView = (RecyclerView) findViewById(R.id.category_recyclerView);
         back = (TextView) findViewById(R.id.category_back);
         back.setOnClickListener(this);
@@ -138,6 +143,11 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
                     categoryModelList.add(doc.toObject(CategoryModel.class));
                 }
                 adapter.notifyDataSetChanged();
+                if (categoryModelList.isEmpty()) {
+                    emptyLayout.setVisibility(View.VISIBLE);
+                }else{
+                    emptyLayout.setVisibility(View.GONE);
+                }
 
             }
 

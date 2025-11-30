@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:layout_margin="3dp"
+    android:background="@drawable/bg_popup"
+    android:animationCache="false">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_whatsapp"
+        android:layout_gravity="center"
+        android:padding="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Invoice on WhatsApp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter the WhatsApp number to share the invoice PDF"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textColor="#666"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Token #"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:id="@+id/tvTokenNo"
+        android:textColor="#666"
+        android:textStyle="bold"
+        android:layout_marginTop="4dp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginTop="20dp">
+
+        <EditText
+            android:id="@+id/etMobile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="WhatsApp Number"
+            android:inputType="phone"
+            android:background="@drawable/search_bg"
+            android:paddingRight="45dp"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/btnPickContact"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="10sp"
+            android:src="@drawable/baseline_contact_page_24"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Invoice"
+        android:textSize="14sp"
+        android:backgroundTint="#25D366"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="20dp" />
+
+    <Button
+        android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="Cancel"
+        android:textAllCaps="false"
+        android:backgroundTint="@android:color/transparent"
+        android:textColor="#888"
+        android:layout_marginTop="10dp" />
+</LinearLayout>

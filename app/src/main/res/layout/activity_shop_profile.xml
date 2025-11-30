@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/page_bg"
     tools:context=".activity.ShopProfileActivity">
 
     <LinearLayout
@@ -71,8 +72,7 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="@drawable/circle_bg"
-                android:padding="3dp"
-                android:src="@drawable/client_logo" />
+                android:padding="3dp" />
 
 
             <com.google.android.material.textfield.TextInputLayout

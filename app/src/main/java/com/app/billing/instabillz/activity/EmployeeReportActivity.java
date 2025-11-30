@@ -12,6 +12,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +61,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
     AttendanceViewAdapter adapter;
     List<AttendanceModel> attendanceModelList;
     RecyclerView recyclerView;
+    LinearLayout emptyLayout;
 
     FirebaseFirestore db;
     SharedPrefHelper sharedPrefHelper;
@@ -97,10 +99,11 @@ public class EmployeeReportActivity extends AppCompatActivity {
         dateRangeSpinner = findViewById(R.id.attendance_report_date_range);
         btnSearch = findViewById(R.id.attendance_report_search);
         recyclerView = findViewById(R.id.attendance_report_recyclerView);
+        emptyLayout = (LinearLayout)findViewById(R.id.emptyLayout);
 
         // 🔹 Load sample employee names
 
-        employeeList.add("Select Employee"); // default option
+        employeeList.add("ALL"); // default option
 
         employeeAdapter = new ArrayAdapter<>(
                 this,
@@ -152,7 +155,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
         };
 
         attendanceModelList = new ArrayList<>();
-        loadHeaderData(attendanceModelList);
+        //loadHeaderData(attendanceModelList);
         adapter = new AttendanceViewAdapter(context, attendanceModelList, listener,"ADMIN".equalsIgnoreCase(sharedPrefHelper.getSystemUserRole()));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);
@@ -161,6 +164,12 @@ public class EmployeeReportActivity extends AppCompatActivity {
         employeeName = intent.getStringExtra("employee_name");
         if (StringUtils.isNotBlank(employeeName)) {
             dateRange = "Today";
+            dateRangeSpinner.setSelection(dateRangeAdapter.getPosition(dateRange));
+            employeeSpinner.setSelection(employeeAdapter.getPosition(employeeName));
+            fetchAttendance(employeeName, dateRange);
+        }else{
+            dateRange = "Today";
+            employeeName = "ALL";
             dateRangeSpinner.setSelection(dateRangeAdapter.getPosition(dateRange));
             employeeSpinner.setSelection(employeeAdapter.getPosition(employeeName));
             fetchAttendance(employeeName, dateRange);
@@ -315,7 +324,7 @@ public class EmployeeReportActivity extends AppCompatActivity {
         // 🔹 Build the query
         Query query = db.collection(sharedPrefHelper.getAppName() + AppConstants.ATTENDANCE_COLLECTION);
 
-        if (!employeeName.equals("Select Employee") && !employeeName.equals("ALL")) {
+        if (employeeName!= null && !employeeName.equals("Select Employee") && !employeeName.equals("ALL")) {
             query = query.whereEqualTo("employeeName", employeeName);
         }
 
@@ -333,8 +342,11 @@ public class EmployeeReportActivity extends AppCompatActivity {
                     }
                     adapter.notifyDataSetChanged();
                     // 🔹 Update RecyclerView or show message
-                    if (attendanceModelList.isEmpty()) {
-                        Toast.makeText(this, "No attendance records found.", Toast.LENGTH_SHORT).show();
+                    if (attendanceModelList.size() == 1) {
+                        //Toast.makeText(this, "No attendance records found.", Toast.LENGTH_SHORT).show();
+                        emptyLayout.setVisibility(View.VISIBLE);
+                    }else{
+                        emptyLayout.setVisibility(View.GONE);
                     }
                 })
                 .addOnFailureListener(e -> {

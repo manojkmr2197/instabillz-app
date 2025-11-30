@@ -26,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
@@ -43,24 +44,36 @@ import com.app.billing.instabillz.repository.InstaFirebaseRepository;
 import com.app.billing.instabillz.utils.ReportGenerator;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.app.billing.instabillz.utils.SingleTon;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ProductActivity extends AppCompatActivity implements View.OnClickListener {
 
     TextView back, download;
     RecyclerView recyclerView;
-    FloatingActionButton add_fab;
+    FloatingActionButton add_fab, bulk_add_fab;
 
     Context context;
     Activity activity;
@@ -75,6 +88,14 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
 
     String selectedCategory = "", searchString = "";
     List<String> categoryModelList = new ArrayList<>();
+
+    private static final int PICK_EXCEL = 101;
+    BottomSheetDialog uploadSheet;
+    List<ProductModel> excelRecords = new ArrayList<>();
+    Set<String> categorySet = new HashSet<>();
+
+    private AlertDialog loaderDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +127,9 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
 
         add_fab = (FloatingActionButton) findViewById(R.id.product_add_fab);
         add_fab.setOnClickListener(this);
+
+        bulk_add_fab = (FloatingActionButton) findViewById(R.id.product_bulk_add_fab);
+        bulk_add_fab.setOnClickListener(this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
@@ -209,9 +233,244 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
             downloadProductList();
         } else if (view.getId() == R.id.product_add_fab) {
             productAddDialog(null);
+        } else if (view.getId() == R.id.product_bulk_add_fab) {
+            askWarningPopup();
         }
 
     }
+
+    private void askWarningPopup() {
+        BottomSheetDialog bottomSheet = new BottomSheetDialog(context);
+        View sheetView = getLayoutInflater().inflate(R.layout.dialog_bulk_upload_warning, null);
+        bottomSheet.setContentView(sheetView);
+
+        Button btnContinue = sheetView.findViewById(R.id.btnContinue);
+        Button btnCancel = sheetView.findViewById(R.id.btnCancel);
+
+        btnContinue.setOnClickListener(view -> {
+            bottomSheet.dismiss();
+            showUploadBottomSheet();
+
+        });
+
+        btnCancel.setOnClickListener(view -> bottomSheet.dismiss());
+
+        bottomSheet.show();
+    }
+
+
+    private void showUploadBottomSheet() {
+        uploadSheet = new BottomSheetDialog(context);
+        View view = getLayoutInflater().inflate(R.layout.dialog_bulk_upload_submit, null);
+        uploadSheet.setContentView(view);
+
+        TextView tvFileName = view.findViewById(R.id.tvFileName);
+        TextView tvRowCount = view.findViewById(R.id.tvRowCount);
+        Button btnChooseFile = view.findViewById(R.id.btnChooseFile);
+        Button btnSync = view.findViewById(R.id.btnSync);
+        Button btnCancel = view.findViewById(R.id.btnCancel);
+
+        btnChooseFile.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            startActivityForResult(intent, PICK_EXCEL);
+        });
+
+        btnCancel.setOnClickListener(v -> uploadSheet.dismiss());
+
+        uploadSheet.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_EXCEL && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            parseExcel(uri);
+        }
+    }
+
+    private void parseExcel(Uri uri) {
+        excelRecords.clear();
+        List<String> errorList = new ArrayList<>();
+
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) {
+                    errorList.add("Row " + (i + 1) + " → Empty row");
+                    continue;
+                }
+
+                try {
+                    String name = row.getCell(0).getStringCellValue();
+                    String price = row.getCell(1).toString();
+                    String category = row.getCell(2).getStringCellValue();
+
+                    if (name == null || name.trim().isEmpty()) {
+                        throw new Exception("Product name missing");
+                    }
+                    if (price == null || price.trim().isEmpty()) {
+                        throw new Exception("Product price missing");
+                    }
+                    if (category == null || category.trim().isEmpty()) {
+                        throw new Exception("Product price missing");
+                    }
+                    categorySet.add(category.toUpperCase());
+                    excelRecords.add(new ProductModel(name.toUpperCase(), Double.valueOf(price), category.toUpperCase()));
+
+                } catch (Exception e) {
+                    errorList.add("Row " + (i + 1) + " → " + e.getMessage());
+                }
+            }
+
+            // Update UI in Bottom Sheet
+            TextView tvFileName = uploadSheet.findViewById(R.id.tvFileName);
+            TextView tvRowCount = uploadSheet.findViewById(R.id.tvRowCount);
+            TextView tvErrors = uploadSheet.findViewById(R.id.tvErrors);
+            Button btnSync = uploadSheet.findViewById(R.id.btnSync);
+
+            tvFileName.setText("File Loaded Successfully");
+
+            // Show errors if any
+            if (!errorList.isEmpty()) {
+                tvErrors.setVisibility(View.VISIBLE);
+                tvRowCount.setVisibility(View.GONE);
+
+                StringBuilder sb = new StringBuilder();
+                for (String err : errorList) {
+                    sb.append(err).append("\n");
+                }
+                tvErrors.setText(sb.toString());
+            } else {
+                tvErrors.setVisibility(View.GONE);
+                tvRowCount.setText("Valid Rows: " + excelRecords.size());
+            }
+
+            // Sync only if at least 1 valid row exists
+            if (!excelRecords.isEmpty() && errorList.isEmpty()) {
+                btnSync.setVisibility(View.VISIBLE);
+
+                btnSync.setOnClickListener(v -> {
+                    bulkUploadProducts();
+                    uploadSheet.dismiss();
+                });
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error reading Excel file", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private Task<Void> deleteCollection(String collectionName) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference colRef = db.collection(collectionName);
+
+        return colRef.get().continueWithTask(task -> {
+            WriteBatch batch = db.batch();
+            for (DocumentSnapshot doc : task.getResult()) {
+                batch.delete(doc.getReference());
+            }
+            return batch.commit();
+        });
+    }
+
+
+    private Task<Void> bulkInsert(String collectionName, List<?> list) {
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        List<Task<Void>> taskList = new ArrayList<>();
+
+        int batchSize = 500;
+        WriteBatch batch = db.batch();
+        int counter = 0;
+
+        for (Object obj : list) {
+
+            DocumentReference ref = db.collection(collectionName).document();
+            batch.set(ref, obj);
+            counter++;
+
+            if (counter == batchSize) {
+                taskList.add(batch.commit());
+                batch = db.batch();
+                counter = 0;
+            }
+        }
+
+        // Commit last batch
+        if (counter > 0) {
+            taskList.add(batch.commit());
+        }
+
+        return Tasks.whenAll(taskList);
+    }
+
+    private void showLoader() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setView(R.layout.loader_layout); // Your custom loader layout with ProgressBar
+        loaderDialog = builder.create();
+        loaderDialog.show();
+    }
+
+    private void hideLoader() {
+        if (loaderDialog != null && loaderDialog.isShowing()) {
+            loaderDialog.dismiss();
+        }
+    }
+
+
+    private void bulkUploadProducts() {
+
+        showLoader();
+        List<CategoryModel> categoryList = new ArrayList<>();
+        for (String cat : categorySet) {
+            categoryList.add(new CategoryModel(SingleTon.generateCategoryDocument(), cat));
+        }
+
+        for (ProductModel productModel : excelRecords) {
+            productModel.setId(SingleTon.generateProductDocument());
+        }
+
+        // STEP 1: Delete categories
+        deleteCollection(sharedPrefHelper.getAppName() + AppConstants.CATEGORIES_COLLECTION)
+                .addOnSuccessListener(a -> {
+
+                    // STEP 2: Delete products
+                    deleteCollection(sharedPrefHelper.getAppName() + AppConstants.PRODUCTS_COLLECTION)
+                            .addOnSuccessListener(b -> {
+
+                                // STEP 3: Insert categories
+                                bulkInsert(sharedPrefHelper.getAppName() + AppConstants.CATEGORIES_COLLECTION, categoryList)
+                                        .addOnSuccessListener(c -> {
+
+                                            // STEP 4: Insert products
+                                            bulkInsert(sharedPrefHelper.getAppName() + AppConstants.PRODUCTS_COLLECTION, excelRecords)
+                                                    .addOnSuccessListener(d -> {
+                                                        hideLoader();
+                                                        Toast.makeText(
+                                                                this,
+                                                                "Sync Completed!\n" +
+                                                                        "Categories: " + categoryList.size() + "\n" +
+                                                                        "Products: " + excelRecords.size(),
+                                                                Toast.LENGTH_LONG
+                                                        ).show();
+
+                                                        uploadSheet.dismiss();
+                                                    });
+                                        });
+                            });
+                });
+
+    }
+
 
     private void downloadProductList() {
         try {
@@ -296,7 +555,7 @@ public class ProductActivity extends AppCompatActivity implements View.OnClickLi
                 }
             });
 
-            if(StringUtils.isNotBlank(productModel.getCategoryName())){
+            if (StringUtils.isNotBlank(productModel.getCategoryName())) {
                 categorySpinner.setSelection(arrayadapter.getPosition(productModel.getCategoryName()));
             }
         } else {

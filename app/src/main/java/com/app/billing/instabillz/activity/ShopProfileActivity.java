@@ -31,6 +31,7 @@ import com.app.billing.instabillz.adapter.UrlAdapter;
 import com.app.billing.instabillz.constants.AppConstants;
 import com.app.billing.instabillz.model.ShopsModel;
 import com.app.billing.instabillz.repository.InstaFirebaseRepository;
+import com.app.billing.instabillz.utils.ImageLoader;
 import com.app.billing.instabillz.utils.SharedPrefHelper;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -46,6 +47,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ShopProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -77,6 +80,7 @@ public class ShopProfileActivity extends AppCompatActivity implements View.OnCli
 
     FirebaseFirestore db;
 
+    CircleImageView shopImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +110,8 @@ public class ShopProfileActivity extends AppCompatActivity implements View.OnCli
             }
         });
 
+        shopImage = (CircleImageView) findViewById(R.id.shop_profile_image);
+        ImageLoader.loadBrandLogo(context,shopImage);
         name = (EditText) findViewById(R.id.shop_profile_name);
         phone = (EditText) findViewById(R.id.shop_profile_phone);
         address = (EditText) findViewById(R.id.shop_profile_address);
