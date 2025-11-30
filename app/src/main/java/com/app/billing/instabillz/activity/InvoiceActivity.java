@@ -693,7 +693,8 @@ public class InvoiceActivity extends AppCompatActivity {
 
     private boolean isAppInstalled(String packageName) {
         try {
-            context.getPackageManager().getPackageInfo(packageName, 0);
+            context.getPackageManager()
+                    .getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
             return true;
         } catch (PackageManager.NameNotFoundException e) {
             return false;
