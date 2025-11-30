@@ -82,6 +82,7 @@
         <item>Bakery</item>
         <item>Pharmacy</item>
         <item>Super Market</item>
+        <item>Beauty Parlour</item>
     </string-array>
 
     <string-array name="spinner_billing_type">
